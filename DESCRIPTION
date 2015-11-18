@@ -1,10 +1,20 @@
 Package: parccvizieR
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Analysis and visualization tools for the PARCC Assessment
 Version: 0.1
 Date: 2015-11-18
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
-LazyData: TRUE
+Authors@R: c(
+  person("Andrew", "Martin", role = c("aut","cre"), email = "almartin@gmail.com"),
+  person("Chris", "Haid", role = "aut", email = "chaid@kippchicago.org"))
+Description: parccvizieR is a analytic, visualization, and reporting
+    tools for PARCC data.
+License: file LICENSE
+LazyData: true
+Depends:
+    magrittr,
+    ggplot2
+Suggests:
+    testthat,
+    knitr
+Imports:
+    dplyr
