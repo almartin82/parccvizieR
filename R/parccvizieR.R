@@ -23,32 +23,58 @@ parccvizieR <- function(results, local_roster = NA, verbose = FALSE, ...) {
 #' @export
 parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...) {
 
-  #detect file type
-  result_names <- names(results)
+  #first read the raw file.
+  raw <- suppressWarnings(readr::read_csv(file = results))
 
-  #process the results file
-  result_type <- detect_result_type(result_names)
+  #given the names of the raw file, detect the type
+  result_type <- detect_result_file_origin(names(raw))
 
-  if (result_type == character(0)) {
+  if (identical(result_type, character(0))) {
     stop("Unknown PARCC results type.")
-  } else if (result_type == 'PARCC') {
-    message('Detected PARCC Summative File')
 
-    #process summative data file
-  } else if (result_type == 'LA') {
+  # NJ_SRF is supported.
+  } else if (identical(result_type, 'NJ_SRF')) {
+    message('Detected NJ PARCC Summative Record File')
+
+    #process NJ_SRF
+
+  # stub. left as an exercise for future development / contributors
+  } else if (identical(result_type, 'PARCC')) {
+    message('Detected Generic PARCC Summative File')
+    message('Please write a processing function for me :)')
+
+    #TODO: process Generic PARCC Summative File data file
+
+  # stub. left as an exercise for future development / contributors
+  } else if (identical(result_type, 'LA')) {
     message('Detected Louisiana Roster file')
+    message('Please write a processing function for me :)')
 
-    #process louisiana data file
+    #TODO: process louisiana data file
   }
 
   #return parccvizieR object
   out <- NA
-  class(parccviz) <- "parccvizieR"
+  class(out) <- "parccvizieR"
 
   out
 }
 
-detect_result_type <- function(df) {
+
+#' Detect Type/Origin of Raw PARCC Results File
+#'
+#' @description PARCC is a consortium, and (we believe) each state has some
+#' flexibility in how it reports the core PARCC results.  For instance, MA has
+#' a hybrid assessment that includes PARCC content and state content.  This
+#' function detects the type of file by looking at the names/columns, and
+#' processes accordingly.
+#'
+#' @param df
+#'
+#' @return character string representing type detected
+#' @export
+
+detect_result_file_origin <- function(df) {
 
   LA <- c("District.Code", "District.Name", "School.Code", "School.Name",
     "Last.Name", "First.Name", "Middle.Initial", "Student.ID", "Grade",
