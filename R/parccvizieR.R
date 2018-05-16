@@ -23,8 +23,14 @@ parccvizieR <- function(results, local_roster = NA, verbose = FALSE, ...) {
 #' @export
 parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...) {
 
-  #first read the raw file.
-  raw <- suppressWarnings(readr::read_csv(file = results))
+  #read in results.  get a list of one OR MORE paths to files.
+
+  #for EACH FILE, determine the layout
+
+  #use map2df on the list of files and list of layouts to process the data
+
+
+  raw <- read_raw_results(results)
 
   #given the names of the raw file, detect the type
   result_type <- detect_result_file_origin(names(raw))
@@ -58,6 +64,23 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...
   class(out) <- "parccvizieR"
 
   out
+}
+
+
+read_raw_results <- function(x) {
+
+  #if csv is in the results argument, assume that we have a FILE
+  if (grepl('.csv', x, ignore.case = TRUE)) {
+    raw_path <- x
+  #otherwise assume that we have a PATH, return the FIRST csv in that folder
+  #this is just to detect the format of the results file we are looking at
+  } else {
+    raw_path <- dir(path = x, pattern = "csv", ignore.case = TRUE,
+        recursive = TRUE, full.names = TRUE)[1]
+  }
+
+  #read the raw path
+  suppressMessages(suppressWarnings(readr::read_csv(file = raw_path)))
 }
 
 
@@ -146,7 +169,7 @@ detect_result_file_origin <- function(df) {
     "subclaim4Category", "subclaim5Category", "subclaim6Category",
     "filler.3", "filler.4", "filler.5")
 
-  NJ_SRF <- c("StateAbbreviation", "TestingDistrictCode", "TestingSchoolCode",
+  NJ_SRF17 <- c("StateAbbreviation", "TestingDistrictCode", "TestingSchoolCode",
      "ResponsibleDistrictCode", "ResponsibleSchoolCode", "StateStudentIdentifier",
      "LocalStudentIdentifier", "PARCCStudentIdentifier", "LastOrSurname",
      "FirstName", "MiddleName", "Birthdate", "Sex", "StateField1",
@@ -220,3 +243,6 @@ detect_result_file_origin <- function(df) {
   return(out)
 }
 
+
+read_raw_nj_srf <- function(x) {
+}
