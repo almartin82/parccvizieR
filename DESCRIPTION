@@ -1,18 +1,19 @@
 Package: parccvizieR
 Type: Package
 Title: Analysis and visualization tools for the PARCC Assessment
-Version: 0.1
+Version: 0.2
 Date: 2015-11-18
 Authors@R: c(
   person("Andrew", "Martin", role = c("aut","cre"), email = "almartin@gmail.com"),
-  person("Chris", "Haid", role = "aut", email = "chaid@kippchicago.org"))
+  person("Lu", "Han", role = "aut", email = "lhan@nps.k12.nj.us"))
 Description: parccvizieR is a analytic, visualization, and reporting
     tools for PARCC data.
 License: file LICENSE
 LazyData: true
 Depends:
+    ggplot2,
     magrittr,
-    ggplot2
+    purrr
 Suggests:
     testthat,
     knitr
