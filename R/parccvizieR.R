@@ -288,3 +288,17 @@ detect_result_file_origin <- function(df_path) {
 
   return(out)
 }
+
+
+read_results_file <- function(path, format) {
+
+  if (format == 'NJ_SRF15') {
+
+  } else if (format == 'NJ_SRF16') {
+
+  } else if (format == 'NJ_SRF17') {
+
+  } else if (format == 'NJ_SRF18') {
+    #when we see 2017-18 SRF, add something here
+  }
+}
