@@ -4,10 +4,10 @@
 \alias{detect_result_file_origin}
 \title{Detect Type/Origin of Raw PARCC Results File}
 \usage{
-detect_result_file_origin(df)
+detect_result_file_origin(df_path)
 }
 \arguments{
-\item{df}{}
+\item{df_path}{}
 }
 \value{
 character string representing type detected

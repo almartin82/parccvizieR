@@ -3,3 +3,4 @@
 S3method(parccvizieR,default)
 export(detect_result_file_origin)
 export(parccvizieR)
+export(read_raw_results)

@@ -4,15 +4,18 @@
 \alias{parccvizieR}
 \title{Create a parccvizieR object}
 \usage{
-parccvizieR(results, local_roster = NA, verbose = FALSE, ...)
+parccvizieR(results, local_roster = NA, verbose = TRUE)
 }
 \arguments{
-\item{results}{a PARCC roster, or summative file}
-
 \item{local_roster}{optional.  additional roster data to supplement
 the data in the PARCC file.}
 
-\item{...}{additional arguments}
+\item{verbose}{print status updates as the data is processed?
+default is TRUE}
+
+\item{results_location}{a file, or directory of files, containing PARCC
+results.  parccvizieR supports NJ summative record files, but is
+architected to gracefully extend support to other PARCC consortium states}
 }
 \description{
 \code{parccvizieR} is the primary workflow function that generates the
