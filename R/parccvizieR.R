@@ -4,10 +4,13 @@
 #' \code{parccvizieR} is the primary workflow function that generates the
 #' parccvizieR object
 #'
-#' @param results a PARCC roster, or summative file
+#' @param results_location a file, or directory of files, containing PARCC
+#' results.  parccvizieR supports NJ summative record files, but is
+#' architected to gracefully extend support to other PARCC consortium states
 #' @param local_roster optional.  additional roster data to supplement
 #' the data in the PARCC file.
-#' @param ... additional arguments
+#' @param verbose print status updates as the data is processed?
+#' default is TRUE
 #' @examples
 #'\dontrun{
 #' pviz <- parccvizieR(sf = ex_sf)
@@ -16,52 +19,84 @@
 #' }
 #' @export
 
-parccvizieR <- function(results, local_roster = NA, verbose = FALSE, ...) {
+parccvizieR <- function(results, local_roster = NA, verbose = TRUE) {
   UseMethod("parccvizieR")
 }
 
 #' @export
 parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...) {
 
-  #detect file type
-  result_names <- names(results)
+  #read in results.  get a list of one OR MORE paths to files.
+  raw_files <- read_raw_results(results)
 
-  #process the results file
-  result_type <- detect_result_type(result_names)
+  #for EACH FILE, determine the layout
+  file_layouts <- map_chr(
+    raw_files,
+    detect_result_file_layout
+  )
 
-  if (result_type == character(0)) {
-    stop("Unknown PARCC results type.")
-  } else if (result_type == 'PARCC') {
-    message('Detected PARCC Summative File')
+  #list to house all of the parccvizieR data objects
+  out <- list()
 
-    #process summative data file
-  } else if (result_type == 'LA') {
-    message('Detected Louisiana Roster file')
-
-    #process louisiana data file
-  }
+  #use map2df on the list of files and list of layouts to process the data
+  out$raw <- map2_df(
+    .x = raw_files,
+    .y = file_layouts,
+    .f = ~read_results_file(.x, .y)
+  )
 
   #return parccvizieR object
-  out <- NA
-  class(parccviz) <- "parccvizieR"
+  #out <- NA
+  class(out) <- "parccvizieR"
 
   out
 }
 
-detect_result_type <- function(df) {
 
-  LA <- c("District.Code", "District.Name", "School.Code", "School.Name",
-    "Last.Name", "First.Name", "Middle.Initial", "Student.ID", "Grade",
-    "Gender", "Ethnicity", "Education.Classification", "Economically.Disadvantaged.Status",
-    "Limited.English.Proficient", "Migrant", "Section.504", "ELA.Scale.Score",
-    "ELA.Achievement.Level", "ELA.Reading.Performance", "ELA.Writing.Performance",
-    "ELA.Informational.Text", "Reading.Literary.Text", "Reading.Vocabulary",
-    "Written.Expression", "Written.Knowledge...Use.of.Language.Convention",
-    "Math.Scale.Score", "Math.Achievement.Level", "Major.Content",
-    "Expressing.Mathematical.Reasoning", "Modeling...Application",
-    "Additional...Supporting.Content")
+#' Title
+#'
+#' @param x the results argument from parccvizieR.  either a path to one file
+#' OR a folder of files
+#'
+#' @return character vector of full paths to results files
+#' @export
 
-  PARCC <- c("recordType", "multipleRecordFlag", "reportedSummativeScoreFlag",
+read_raw_results <- function(x) {
+
+  #if we can find 'dot csv' in the results argument,
+  #assume that we have a path to a SINGLE FILE and return that.
+  if (grepl('.csv', x, ignore.case = TRUE)) {
+    out <- file.path(dirname(x), basename(x))
+  #otherwise assume we have a directory.  in that case, return a vector of
+  #paths.
+  } else {
+    out <- dir(path = x, pattern = "csv", ignore.case = TRUE,
+        recursive = TRUE, full.names = TRUE)
+  }
+
+  out
+}
+
+
+#' Detect Layout/Origin of Raw PARCC Results File
+#'
+#' @description PARCC is a consortium, and (we believe) each state has some
+#' flexibility in how it reports the core PARCC results.  For instance, MA has
+#' a hybrid assessment that includes PARCC content and state content.  This
+#' function detects the type of file by looking at the names/columns, and
+#' processes accordingly.
+#'
+#' @param df_path
+#'
+#' @return character string representing type detected
+#' @export
+
+detect_result_file_layout <- function(df_path) {
+
+  df_names <- suppressMessages(suppressWarnings(readr::read_csv(df_path))) %>%
+    names()
+
+  NJ_SRF15 <- c("recordType", "multipleRecordFlag", "reportedSummativeScoreFlag",
     "reportedRosterFlag", "reportSuppressionCode", "reportSuppressionAction",
     "assessmentYear", "pba03Category", "eoy03Category", "stateAbbreviation",
     "responsibleDistrictIdentifier", "responsibleDistrictName", "responsibleSchoolInstitutionIdentifier",
@@ -112,20 +147,317 @@ detect_result_type <- function(df) {
     "eoyUnit4TotalNumberOfItems", "eoyUnit4NumberOfAttemptedItems",
     "eoyUnit5TotalNumberOfItems", "eoyUnit5NumberOfAttemptedItems",
     "pbaNotTestedReason", "eoyNotTestedReason", "pbaVoidPbaEoyScoreReason",
-    "eoyVoidPbaEoyScoreReason", "filler.1", "filler.2", "summativeScaleScore",
+    "eoyVoidPbaEoyScoreReason", "filler_1", "filler_2", "summativeScaleScore",
     "summativeCsem", "summativePerformanceLevel", "summativeReadingScaleScore",
     "summativeReadingCsem", "summativeWritingScaleScore", "summativeWritingCsem",
     "subclaim1Category", "subclaim2Category", "subclaim3Category",
     "subclaim4Category", "subclaim5Category", "subclaim6Category",
-    "filler.3", "filler.4", "filler.5")
+    "filler_3", "filler_4", "filler_5")
 
-  results_files <- list('LA' = LA, 'PARCC' = PARCC)
+  NJ_SRF16 <- c("StateAbbreviation", "TestingDistrictCode", "TestingSchoolCode",
+    "ResponsibleDistrictCode", "ResponsibleSchoolCode", "StateStudentIdentifier",
+    "LocalStudentIdentifier", "PARCCStudentIdentifier", "LastOrSurname",
+    "FirstName", "MiddleName", "Birthdate", "Sex", "StateField1",
+    "GradeLevelWhenAssessed", "HispanicOrLatinoEthnicity", "AmericanIndianOrAlaskaNative",
+    "Asian", "BlackOrAfricanAmerican", "NativeHawaiianOrOtherPacificIslander",
+    "White", "FillerField", "TwoOrMoreRaces", "EnglishLearnerEL",
+    "TitleIIILimitedEnglishProficientParticipationStatus", "GiftedandTalented",
+    "MigrantStatus", "EconomicDisadvantageStatus", "StudentWithDisabilities",
+    "PrimaryDisabilityType", "StateField2", "StateField3", "StateField4",
+    "StateField5", "StateField6", "StateField7", "StateField8", "StateField9",
+    "StateField10", "StateField11", "StateField12", "Filler", "ClassName",
+    "TestAdministrator", "StaffMemberIdentifier", "TestCode", "Filler_1",
+    "Retest", "ELAccommodation", "FrequentBreaks", "SeparateAlternateLocation",
+    "SmallTestingGroup", "SpecializedEquipmentOrFurniture", "SpecifiedAreaOrSetting",
+    "TimeOfDay", "AnswerMasking", "FillerField_1", "ColorContrast",
+    "ASLVideo", "AssistiveTechnologyScreenReader", "AssistiveTechnologyNonScreenReader",
+    "ClosedCaptioningForELAL", "RefreshableBrailleDisplayForELAL",
+    "AlternateRepresentationPaperTest", "LargePrint", "BrailleWithTactileGraphics",
+    "StudentReadsAssessmentAloudToThemselves", "HumanSignerForTestDirections",
+    "AnswersRecordedInTestBook", "BrailleResponse", "CalculationDeviceAndMathematicsTools",
+    "ELALConstructedResponse", "ELALSelectedResponseOrTechnologyEnhancedItems",
+    "MathematicsResponse", "MonitorTestResponse", "WordPrediction",
+    "AdministrationDirectionsClarifiedinStudentsNativeLanguage",
+    "AdministrationDirectionsReadAloudinStudentsNativeLanguage",
+    "MathematicsResponseEL", "TranslationOfTheMathematicsAssessment",
+    "WordtoWordDictionaryEnglishNativeLanguage", "TextToSpeech",
+    "HumanReaderOrHumanSigner", "UniqueAccommodation", "EmergencyAccommodation",
+    "ExtendedTime", "StudentTestUUID", "PaperFormID", "OnlineFormID",
+    "TestStatus", "TotalTestItems", "TestAttemptednessFlag", "TotalTestItemsAttempted",
+    "PaperUnit1TotalTestItems", "PaperSection1NumberofAttemptedItems",
+    "PaperSection2TotalTestItems", "PaperSection2NumberofAttemptedItems",
+    "PaperSection3TotalTestItems", "PaperSection3NumberofAttemptedItems",
+    "PaperSection4TotalTestItems", "PaperSection4NumberofAttemptedItems",
+    "StudentUnit1TestUUID", "Unit1FormID", "Unit1TotalTestItems",
+    "Unit1NumberofAttemptedItems", "StudentUnit2TestUUID", "Unit2FormID",
+    "Unit2TotalTestItems", "Unit2NumberOfAttemptedItems", "StudentUnit3TestUUID",
+    "Unit3FormID", "Unit3TotalTestItems", "Unit3NumberOfAttemptedItems",
+    "StudentUnit4TestUUID", "Unit4FormID", "Unit4TotalTestItems",
+    "Unit4NumberofAttemptedItems", "NotTestedCode", "NotTestedReason",
+    "VoidScoreCode", "VoidScoreReason", "ShipReportDistrictCode",
+    "ShipReportSchoolCode", "Summative Flag", "MultipleTestRegistration",
+    "RosterFlag", "ReportSuppressionCode", "ReportSuppressionAction",
+    "AttemptCreateDate", "Unit1OnlineTestStartDateTime", "Unit1OnlineTestEndDateTime",
+    "Unit2OnlineTestStartDateTime", "Unit2OnlineTestEndDateTime",
+    "Unit3OnlineTestStartDateTime", "Unit3OnlineTestEndDateTime",
+    "Unit4OnlineTestStartDateTime", "Unit4OnlineTestEndDateTime",
+    "AssessmentYear", "AssessmentGrade", "Subject", "FederalRaceEthnicity",
+    "Period", "TestingOrganizationalType", "TestingDistrictName",
+    "TestingSchoolName", "ResponsibleOrganizationCodeType", "ResponsibleDistrictName",
+    "ResponsibleSchoolName", "Filler_2", "Filler_3", "Filler_4",
+    "Filler_5", "Filler_6", "Filler_7", "TestScaleScore", "TestCSEMProbableRange",
+    "TestPerformanceLevel", "TestReadingScaleScore", "TestReadingCSEM",
+    "TestWritingScaleScore", "TestWritingCSEM", "Subclaim1Category",
+    "Subclaim2Category", "Subclaim3Category", "Subclaim4Category",
+    "Subclaim5Category", "Subclaim6Category", "Filler_8", "Filler_9",
+    "Filler_10", "Filler_11", "TestScoreComplete"
+  )
+
+  NJ_SRF17 <- c("StateAbbreviation", "TestingDistrictCode", "TestingSchoolCode",
+     "ResponsibleDistrictCode", "ResponsibleSchoolCode", "StateStudentIdentifier",
+     "LocalStudentIdentifier", "PARCCStudentIdentifier", "LastOrSurname",
+     "FirstName", "MiddleName", "Birthdate", "Sex", "StateField1",
+     "GradeLevelWhenAssessed", "HispanicOrLatinoEthnicity", "AmericanIndianOrAlaskaNative",
+     "Asian", "BlackOrAfricanAmerican", "NativeHawaiianOrOtherPacificIslander",
+     "White", "FillerField1", "TwoOrMoreRaces", "EnglishLearnerEL",
+     "TitleIIILimitedEnglishProficientParticipationStatus", "GiftedandTalented",
+     "MigrantStatus", "EconomicDisadvantageStatus", "StudentWithDisabilities",
+     "PrimaryDisabilityType", "StateField2", "StateField3", "StateField4",
+     "StateField5", "StateField6", "StateField7", "StateField8", "StateField9",
+     "StateField10", "StateField11", "StateField12", "FillerField2",
+     "ClassName", "TestAdministrator", "StaffMemberIdentifier", "TestCode",
+     "FillerField", "Retest", "FillerField_1", "FrequentBreaks", "SeparateAlternateLocation",
+     "SmallTestingGroup", "SpecializedEquipmentOrFurniture", "SpecifiedAreaOrSetting",
+     "TimeOfDay", "AnswerMasking", "StudentReadsAssessmentAloudToThemselves",
+     "ColorContrast", "ASLVideo", "AssistiveTechnologyScreenReader",
+     "AssistiveTechnologyNonScreenReader", "ClosedCaptioningForELAL",
+     "RefreshableBrailleDisplayForELAL", "AlternateRepresentationPaperTest",
+     "LargePrint", "BrailleWithTactileGraphics", "FillerField4", "HumanSignerForTestDirections",
+     "AnswersRecordedInTestBook", "BrailleResponse", "CalculationDeviceAndMathematicsTools",
+     "ELALConstructedResponse", "ELALSelectedResponseOrTechnologyEnhancedItems",
+     "MathematicsResponse", "MonitorTestResponse", "WordPredictionForELAL",
+     "AdministrationDirectionsClarifiedinStudentsNativeLanguage",
+     "AdministrationDirectionsReadAloudinStudentsNativeLanguage",
+     "MathematicsResponseEL", "SpanishTransadaptationOfTheMathematicsAssessment",
+     "WordtoWordDictionaryEnglishNativeLanguage", "TextToSpeech",
+     "HumanReaderOrHumanSigner", "UniqueAccommodation", "EmergencyAccommodation",
+     "ExtendedTime", "StudentTestUUID", "PaperFormID", "OnlineFormID",
+     "TestStatus", "TotalTestItems", "TestAttemptednessFlag", "TotalTestItemsAttempted",
+     "PaperSection1TotalTestItems", "PaperSection1NumberofAttemptedItems",
+     "PaperSection2TotalTestItems", "PaperSection2NumberofAttemptedItems",
+     "PaperSection3TotalTestItems", "PaperSection3NumberofAttemptedItems",
+     "PaperSection4TotalTestItems", "PaperSection4NumberofAttemptedItems",
+     "StudentUnit1TestUUID", "Unit1FormID", "Unit1TotalTestItems",
+     "Unit1NumberofAttemptedItems", "StudentUnit2TestUUID", "Unit2FormID",
+     "Unit2TotalTestItems", "Unit2NumberOfAttemptedItems", "StudentUnit3TestUUID",
+     "Unit3FormID", "Unit3TotalTestItems", "Unit3NumberOfAttemptedItems",
+     "StudentUnit4TestUUID", "Unit4FormID", "Unit4TotalTestItems",
+     "Unit4NumberofAttemptedItems", "NotTestedCode", "NotTestedReason",
+     "VoidScoreCode", "VoidScoreReason", "ShipReportDistrictCode",
+     "ShipReportSchoolCode", "SummativeFlag", "MultipleTestRegistration",
+     "RosterFlag", "ReportSuppressionCode", "ReportSuppressionAction",
+     "PaperAttemptCreateDate", "Unit1OnlineTestStartDateTime", "Unit1OnlineTestEndDateTime",
+     "Unit2OnlineTestStartDateTime", "Unit2OnlineTestEndDateTime",
+     "Unit3OnlineTestStartDateTime", "Unit3OnlineTestEndDateTime",
+     "Unit4OnlineTestStartDateTime", "Unit4OnlineTestEndDateTime",
+     "AssessmentYear", "AssessmentGrade", "Subject", "FederalRaceEthnicity",
+     "Period", "TestingOrganizationalType", "TestingDistrictName",
+     "TestingSchoolName", "ResponsibleOrganizationalType", "ResponsibleDistrictName",
+     "ResponsibleSchoolName", "FillerField_2", "FillerField_3", "FillerField_4",
+     "FillerField_5", "FillerField_6", "FillerField_7", "TestScaleScore",
+     "TestCSEMProbableRange", "TestPerformanceLevel", "TestReadingScaleScore",
+     "TestReadingCSEM", "TestWritingScaleScore", "TestWritingCSEM",
+     "Subclaim1Category", "Subclaim2Category", "Subclaim3Category",
+     "Subclaim4Category", "Subclaim5Category", "FillerField5", "FillerField_8",
+     "FillerField_9", "FillerField_10", "FillerField_11", "TestScoreComplete",
+     "FillerField_12", "FillerField_13", "FillerField_14", "FillerField_15",
+     "FillerField_16", "FillerField_17", "FillerField_18", "FillerField_19",
+     "FillerField_20", "FillerField_21", "FillerField_22", "FillerField_23",
+     "FillerField_24", "FillerField_25", "FillerField_26", "FillerField_27",
+     "FillerField7", "FillerField_28", "FillerField_29", "FillerField_30"
+  )
+
+  results_files <- list(
+    'NJ_SRF15' = NJ_SRF15, 'NJ_SRF16' = NJ_SRF16, 'NJ_SRF17' = NJ_SRF17
+  )
 
   mask <- vapply(
-    X = results_files, FUN = function(x) setequal(df, x), logical(1)
+    X = results_files, FUN = function(x) setequal(df_names, x), logical(1)
   )
   out <- names(results_files)[mask]
+
+  if (length(out) == 0) {
+    stop(paste0(
+      sprintf("Unable to determine file format for %s.", df_path), '\n',
+      "parccvizieR currently supports NJ SRF files for 2014-15", '\n' ,
+      "through 2017-18.  Please file an issue at:", '\n',
+      "https://github.com/almartin82/parccvizieR/issues", '\n',
+      "with any details of your result file (eg, State?)."
+    ))
+  }
 
   return(out)
 }
 
+
+#' Read a results file given a path and file format
+#'
+#' @param path full path to file, output of read_raw_results
+#' @param format file format detected, output of detect_result_file_layout
+#'
+#' @return data.frame/tbl
+#' @export
+
+read_results_file <- function(path, format) {
+
+  if (format == 'NJ_SRF15') {
+    out <- process_nj_srf15(path)
+  } else if (format == 'NJ_SRF16') {
+    out <- process_nj_srf16(path)
+  } else if (format == 'NJ_SRF17') {
+    out <- process_nj_srf17(path)
+  } else if (format == 'NJ_SRF18') {
+    out <- process_nj_srf18(path)
+  }
+
+  out
+}
+
+
+#' Common/universal reading and cleaning of a data file
+#'
+#' @param path full path to file, output of read_raw_results
+#'
+#' @return data.frame/tbl
+
+basic_read <- function(path) {
+  df <- suppressMessages(suppressWarnings(
+    readr::read_csv(path) %>%
+    janitor::clean_names()
+  ))
+
+  #remove all filler columns per issue #4
+  is_filler <- grepl('^filler_', names(df))
+  df <- df[, !is_filler]
+
+  #optionalStateData to StateField
+  names(df) <- gsub('optional_state_data', 'state_field', names(df))
+  names(df) <- gsub('clarifiedin', 'clarified_in', names(df))
+  names(df) <- gsub('aloudin', 'aloud_in', names(df))
+  names(df) <- gsub('english_learner_el', 'english_learner', names(df))
+  names(df) <- gsub('giftedand_talented', 'gifted_and_talented', names(df))
+
+  names(df) <- gsub('last_name', 'last_or_surname', names(df))
+
+  #straight up a typo in the SRF
+  names(df) <- gsub('paper_unit1', 'paper_section1', names(df))
+
+  #sort of unclear?
+  names(df) <- gsub('responsible_organization_code_type', 'responsible_organizational_type', names(df))
+
+  names(df) <- gsub('district_identifier', 'district_code', names(df))
+  names(df) <- gsub('school_institution', 'school', names(df))
+  names(df) <- gsub('school_identifier', 'school_code', names(df))
+
+
+
+
+  #common cleaning for fields in ALL srfs
+  #make several columns character
+  df <- df %>%
+    mutate_at(
+      .vars = vars(local_student_identifier,
+                   state_field8),
+      as.character
+    )
+
+  df
+}
+
+
+#' Clean columns present in 2016 SRFs and on, but not in the weird 2015 file
+#'
+#' @param df data frame, product of basic_read
+#'
+#' @return data.frame/tbl
+#' @export
+
+clean_nj_2016_plus <- function(df) {
+
+  #character
+  df <- df %>%
+    mutate_at(
+      .vars = vars(paper_section1numberof_attempted_items),
+      as.character
+    )
+
+  #numeric
+  df <- df %>%
+    mutate_at(
+      .vars = vars(paper_section1numberof_attempted_items,
+                   paper_section1total_test_items,
+                   paper_section2numberof_attempted_items,
+                   paper_section2total_test_items,
+                   paper_section3numberof_attempted_items,
+                   paper_section3total_test_items,
+                   paper_section4numberof_attempted_items,
+                   paper_section4total_test_items,
+                   unit1total_test_items,
+                   unit2total_test_items,
+                   unit3total_test_items,
+                   unit4total_test_items,
+                   unit4numberof_attempted_items),
+      as.numeric
+    )
+
+  #date
+  df <- df %>%
+    mutate_at(
+      .vars = vars(unit1online_test_start_date_time,
+                   unit1online_test_end_date_time,
+                   unit2online_test_start_date_time,
+                   unit2online_test_end_date_time,
+                   unit3online_test_start_date_time,
+                   unit3online_test_end_date_time,
+                   unit4online_test_start_date_time,
+                   unit4online_test_end_date_time),
+      ymd_hms
+    )
+
+  df
+}
+
+#' Process a NJ SRF file (any year)
+#'
+#' @inheritParams basic_read
+#'
+#' @return data.frame/tbl
+#' @export
+
+process_nj_srf15 <- function(path) {
+  basic_read(path)
+}
+
+#' @rdname process_nj_srf15
+#' @export
+
+process_nj_srf16 <- function(path) {
+  df <- basic_read(path)
+  clean_nj_2016_plus(df)
+}
+
+#' @rdname process_nj_srf15
+#' @export
+
+process_nj_srf17 <- function(path) {
+  df <- basic_read(path)
+  clean_nj_2016_plus(df)
+}
+
+#' @rdname process_nj_srf15
+#' @export
+
+process_nj_srf18 <- function(path) {
+  df <- basic_read(path)
+  clean_nj_2016_plus(df)
+}
