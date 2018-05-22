@@ -11,7 +11,9 @@ Description: parccvizieR is a analytic, visualization, and reporting
 License: file LICENSE
 LazyData: true
 Depends:
+    dplyr,
     ggplot2,
+    lubridate,
     magrittr,
     purrr
 Suggests:
