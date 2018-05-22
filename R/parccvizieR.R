@@ -340,10 +340,92 @@ basic_read <- function(path) {
   is_filler <- grepl('^filler_', names(df))
   df <- df[, !is_filler]
 
+  #optionalStateData to StateField
+  names(df) <- gsub('optional_state_data', 'state_field', names(df))
+  names(df) <- gsub('clarifiedin', 'clarified_in', names(df))
+  names(df) <- gsub('aloudin', 'aloud_in', names(df))
+  names(df) <- gsub('english_learner_el', 'english_learner', names(df))
+  names(df) <- gsub('giftedand_talented', 'gifted_and_talented', names(df))
+
+  names(df) <- gsub('last_name', 'last_or_surname', names(df))
+
+  #straight up a typo in the SRF
+  names(df) <- gsub('paper_unit1', 'paper_section1', names(df))
+
+  #sort of unclear?
+  names(df) <- gsub('responsible_organization_code_type', 'responsible_organizational_type', names(df))
+
+  names(df) <- gsub('district_identifier', 'district_code', names(df))
+  names(df) <- gsub('school_institution', 'school', names(df))
+  names(df) <- gsub('school_identifier', 'school_code', names(df))
+
+
+
+
+  #common cleaning for fields in ALL srfs
+  #make several columns character
+  df <- df %>%
+    mutate_at(
+      .vars = vars(local_student_identifier,
+                   state_field8),
+      as.character
+    )
+
   df
 }
 
 
+#' Clean columns present in 2016 SRFs and on, but not in the weird 2015 file
+#'
+#' @param df data frame, product of basic_read
+#'
+#' @return data.frame/tbl
+#' @export
+
+clean_nj_2016_plus <- function(df) {
+
+  #character
+  df <- df %>%
+    mutate_at(
+      .vars = vars(paper_section1numberof_attempted_items),
+      as.character
+    )
+
+  #numeric
+  df <- df %>%
+    mutate_at(
+      .vars = vars(paper_section1numberof_attempted_items,
+                   paper_section1total_test_items,
+                   paper_section2numberof_attempted_items,
+                   paper_section2total_test_items,
+                   paper_section3numberof_attempted_items,
+                   paper_section3total_test_items,
+                   paper_section4numberof_attempted_items,
+                   paper_section4total_test_items,
+                   unit1total_test_items,
+                   unit2total_test_items,
+                   unit3total_test_items,
+                   unit4total_test_items,
+                   unit4numberof_attempted_items),
+      as.numeric
+    )
+
+  #date
+  df <- df %>%
+    mutate_at(
+      .vars = vars(unit1online_test_start_date_time,
+                   unit1online_test_end_date_time,
+                   unit2online_test_start_date_time,
+                   unit2online_test_end_date_time,
+                   unit3online_test_start_date_time,
+                   unit3online_test_end_date_time,
+                   unit4online_test_start_date_time,
+                   unit4online_test_end_date_time),
+      ymd_hms
+    )
+
+  df
+}
 
 #' Process a NJ SRF file (any year)
 #'
@@ -360,20 +442,22 @@ process_nj_srf15 <- function(path) {
 #' @export
 
 process_nj_srf16 <- function(path) {
-  basic_read(path)
+  df <- basic_read(path)
+  clean_nj_2016_plus(df)
 }
 
 #' @rdname process_nj_srf15
 #' @export
 
 process_nj_srf17 <- function(path) {
-  basic_read(path)
+  df <- basic_read(path)
+  clean_nj_2016_plus(df)
 }
 
 #' @rdname process_nj_srf15
 #' @export
 
 process_nj_srf18 <- function(path) {
-  #when we see 2017-18 SRF, add data cleaning steps here
-  basic_read(path)
+  df <- basic_read(path)
+  clean_nj_2016_plus(df)
 }
