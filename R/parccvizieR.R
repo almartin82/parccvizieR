@@ -27,19 +27,29 @@ parccvizieR <- function(results, local_roster = NA, verbose = TRUE) {
 parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...) {
 
   #read in results.  get a list of one OR MORE paths to files.
-  raw <- read_raw_results(results)
+  raw_files <- read_raw_results(results)
 
   #for EACH FILE, determine the layout
-  file_origins <- map_chr(
-    raw,
-    detect_result_file_origin
+  file_layouts <- map_chr(
+    raw_files,
+    detect_result_file_layout
   )
 
+  #list to house all of the parccvizieR data objects
+  out <- list()
+
   #use map2df on the list of files and list of layouts to process the data
+  out$raw <- map2_df(
+    .x = raw_files,
+    .y = file_layouts,
+    .f = ~read_results_file(.x, .y)
+  )
 
   #return parccvizieR object
-  out <- NA
+  #out <- NA
   class(out) <- "parccvizieR"
+
+  out
 }
 
 
@@ -68,7 +78,7 @@ read_raw_results <- function(x) {
 }
 
 
-#' Detect Type/Origin of Raw PARCC Results File
+#' Detect Layout/Origin of Raw PARCC Results File
 #'
 #' @description PARCC is a consortium, and (we believe) each state has some
 #' flexibility in how it reports the core PARCC results.  For instance, MA has
@@ -81,7 +91,7 @@ read_raw_results <- function(x) {
 #' @return character string representing type detected
 #' @export
 
-detect_result_file_origin <- function(df_path) {
+detect_result_file_layout <- function(df_path) {
 
   df_names <- suppressMessages(suppressWarnings(readr::read_csv(df_path))) %>%
     names()
@@ -290,15 +300,80 @@ detect_result_file_origin <- function(df_path) {
 }
 
 
+#' Read a results file given a path and file format
+#'
+#' @param path full path to file, output of read_raw_results
+#' @param format file format detected, output of detect_result_file_layout
+#'
+#' @return data.frame/tbl
+#' @export
+
 read_results_file <- function(path, format) {
 
   if (format == 'NJ_SRF15') {
-
+    out <- process_nj_srf15(path)
   } else if (format == 'NJ_SRF16') {
-
+    out <- process_nj_srf16(path)
   } else if (format == 'NJ_SRF17') {
-
+    out <- process_nj_srf17(path)
   } else if (format == 'NJ_SRF18') {
-    #when we see 2017-18 SRF, add something here
+    out <- process_nj_srf18(path)
   }
+
+  out
+}
+
+
+#' Common/universal reading and cleaning of a data file
+#'
+#' @param path full path to file, output of read_raw_results
+#'
+#' @return data.frame/tbl
+
+basic_read <- function(path) {
+  df <- suppressMessages(suppressWarnings(
+    readr::read_csv(path) %>%
+    janitor::clean_names()
+  ))
+
+  #remove all filler columns per issue #4
+  is_filler <- grepl('^filler_', names(df))
+  df <- df[, !is_filler]
+
+  df
+}
+
+
+
+#' Process a NJ SRF file (any year)
+#'
+#' @inheritParams basic_read
+#'
+#' @return data.frame/tbl
+#' @export
+
+process_nj_srf15 <- function(path) {
+  basic_read(path)
+}
+
+#' @rdname process_nj_srf15
+#' @export
+
+process_nj_srf16 <- function(path) {
+  basic_read(path)
+}
+
+#' @rdname process_nj_srf15
+#' @export
+
+process_nj_srf17 <- function(path) {
+  basic_read(path)
+}
+
+#' @rdname process_nj_srf15
+#' @export
+
+process_nj_srf18 <- function(path) {
+  #when we see 2017-18 SRF, add data cleaning steps here
+  basic_read(path)
 }
