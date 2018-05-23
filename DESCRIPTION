@@ -15,10 +15,9 @@ Depends:
     ggplot2,
     lubridate,
     magrittr,
-    purrr
+    purrr,
+    stringr
 Suggests:
     testthat,
     knitr
-Imports:
-    dplyr
 RoxygenNote: 6.0.1

@@ -46,7 +46,6 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...
   )
 
   #return parccvizieR object
-  #out <- NA
   class(out) <- "parccvizieR"
 
   out
@@ -67,11 +66,11 @@ read_raw_results <- function(x) {
   #assume that we have a path to a SINGLE FILE and return that.
   if (grepl('.csv', x, ignore.case = TRUE)) {
     out <- file.path(dirname(x), basename(x))
-  #otherwise assume we have a directory.  in that case, return a vector of
-  #paths.
+    #otherwise assume we have a directory.  in that case, return a vector of
+    #paths.
   } else {
     out <- dir(path = x, pattern = "csv", ignore.case = TRUE,
-        recursive = TRUE, full.names = TRUE)
+               recursive = TRUE, full.names = TRUE)
   }
 
   out
@@ -97,184 +96,184 @@ detect_result_file_layout <- function(df_path) {
     names()
 
   NJ_SRF15 <- c("recordType", "multipleRecordFlag", "reportedSummativeScoreFlag",
-    "reportedRosterFlag", "reportSuppressionCode", "reportSuppressionAction",
-    "assessmentYear", "pba03Category", "eoy03Category", "stateAbbreviation",
-    "responsibleDistrictIdentifier", "responsibleDistrictName", "responsibleSchoolInstitutionIdentifier",
-    "responsibleSchoolInstitutionName", "pbaTestingDistrictIdentifier",
-    "pbaTestingDistrictName", "pbaTestingSchoolInstitutionIdentifier",
-    "pbaTestingSchoolInstitutionName", "eoyTestingDistrictIdentifier",
-    "eoyTestingDistrictName", "eoyTestingSchoolInstitutionIdentifier",
-    "eoyTestingSchoolInstitutionName", "parccStudentIdentifier",
-    "stateStudentIdentifier", "localStudentIdentifier", "firstName",
-    "middleName", "lastName", "sex", "birthdate", "optionalStateData1",
-    "gradeLevelWhenAssessed", "hispanicOrLatinoEthnicity", "americanIndianOrAlaskaNative",
-    "asian", "blackOrAfricanAmerican", "nativeHawaiianOrOtherPacificIslander",
-    "white", "twoOrMoreRaces", "fillerRaceField", "federalRaceEthnicity",
-    "englishLearner", "titleIIILimitedEnglishProficientParticipationStatus",
-    "giftedAndTalented", "migrantStatus", "economicDisadvantageStatus",
-    "studentWithDisabilities", "primaryDisabilityType", "staffMemberIdentifier",
-    "assessmentAccommodationEnglishLearner", "assessmentAccommodation504",
-    "assessmentAccommodationIndividualizedEducationalPlan", "frequentBreaks",
-    "separateAlternateLocation", "smallTestingGroup", "specializedEquipmentOrFurniture",
-    "specifiedAreaOrSetting", "timeOfDay", "answerMasking", "colorContrast",
-    "textToSpeechForMathematics", "humanReaderOrHumanSignerForMathematics",
-    "aslVideo", "screenReaderOrOtherAssistiveTechnologyApplication",
-    "closedCaptioningForElal", "humanReaderOrHumanSignerForElal",
-    "refreshableBrailleDisplayForElal", "tactileGraphics", "textToSpeechForElal",
-    "answersRecordedInTestBook", "brailleResponse", "calculationDeviceAndMathematicsTools",
-    "elalConstructedResponse", "elalSelectedResponseOrTechnologyEnhancedItems",
-    "mathematicsResponse", "monitorTestResponse", "wordPrediction",
-    "administrationDirectionsClarifiedInStudentsNativeLanguage",
-    "administrationDirectionsReadAloudInStudentsNativeLanguage",
-    "mathematicsResponseEl", "translationOfTheMathematicsAssessmentInTextToSpeech",
-    "translationOfTheMathematicsAssessmentOnline", "wordToWordDictionary",
-    "extendedTime", "alternateRepresentationPaperTest", "translationOfTheMathematicsAssessmentInPaper",
-    "humanReaderOrHumanSigner", "largePrint", "brailleWithTactileGraphics",
-    "optionalStateData2", "optionalStateData3", "optionalStateData4",
-    "optionalStateData5", "optionalStateData6", "optionalStateData7",
-    "optionalStateData8", "filler", "testCode", "assessmentGrade",
-    "subject", "pbaFormId", "eoyFormId", "pbaStudentTestUuid", "eoyStudentTestUuid",
-    "summativeScoreRecordUuid", "pbaTotalTestItems", "pbaTestAttemptednessFlag",
-    "eoyTotalTestItems", "eoyTestAttemptednessFlag", "pbaTotalTestItemsAttempted",
-    "pbaUnit1TotalNumberOfItems", "pbaUnit1NumberOfAttemptedItems",
-    "pbaUnit2TotalNumberOfItems", "pbaUnit2NumberOfAttemptedItems",
-    "pbaUnit3TotalNumberOfItems", "pbaUnit3NumberOfAttemptedItems",
-    "pbaUnit4TotalNumberOfItems", "pbaUnit4NumberOfAttemptedItems",
-    "pbaUnit5TotalNumberOfItems", "pbaUnit5NumberOfAttemptedItems",
-    "eoyTotalTestItemsAttempted", "eoyUnit1TotalNumberOfItems", "eoyUnit1NumberOfAttemptedItems",
-    "eoyUnit2TotalNumberOfItems", "eoyUnit2NumberOfAttemptedItems",
-    "eoyUnit3TotalNumberOfItems", "eoyUnit3NumberOfAttemptedItems",
-    "eoyUnit4TotalNumberOfItems", "eoyUnit4NumberOfAttemptedItems",
-    "eoyUnit5TotalNumberOfItems", "eoyUnit5NumberOfAttemptedItems",
-    "pbaNotTestedReason", "eoyNotTestedReason", "pbaVoidPbaEoyScoreReason",
-    "eoyVoidPbaEoyScoreReason", "filler_1", "filler_2", "summativeScaleScore",
-    "summativeCsem", "summativePerformanceLevel", "summativeReadingScaleScore",
-    "summativeReadingCsem", "summativeWritingScaleScore", "summativeWritingCsem",
-    "subclaim1Category", "subclaim2Category", "subclaim3Category",
-    "subclaim4Category", "subclaim5Category", "subclaim6Category",
-    "filler_3", "filler_4", "filler_5")
+                "reportedRosterFlag", "reportSuppressionCode", "reportSuppressionAction",
+                "assessmentYear", "pba03Category", "eoy03Category", "stateAbbreviation",
+                "responsibleDistrictIdentifier", "responsibleDistrictName", "responsibleSchoolInstitutionIdentifier",
+                "responsibleSchoolInstitutionName", "pbaTestingDistrictIdentifier",
+                "pbaTestingDistrictName", "pbaTestingSchoolInstitutionIdentifier",
+                "pbaTestingSchoolInstitutionName", "eoyTestingDistrictIdentifier",
+                "eoyTestingDistrictName", "eoyTestingSchoolInstitutionIdentifier",
+                "eoyTestingSchoolInstitutionName", "parccStudentIdentifier",
+                "stateStudentIdentifier", "localStudentIdentifier", "firstName",
+                "middleName", "lastName", "sex", "birthdate", "optionalStateData1",
+                "gradeLevelWhenAssessed", "hispanicOrLatinoEthnicity", "americanIndianOrAlaskaNative",
+                "asian", "blackOrAfricanAmerican", "nativeHawaiianOrOtherPacificIslander",
+                "white", "twoOrMoreRaces", "fillerRaceField", "federalRaceEthnicity",
+                "englishLearner", "titleIIILimitedEnglishProficientParticipationStatus",
+                "giftedAndTalented", "migrantStatus", "economicDisadvantageStatus",
+                "studentWithDisabilities", "primaryDisabilityType", "staffMemberIdentifier",
+                "assessmentAccommodationEnglishLearner", "assessmentAccommodation504",
+                "assessmentAccommodationIndividualizedEducationalPlan", "frequentBreaks",
+                "separateAlternateLocation", "smallTestingGroup", "specializedEquipmentOrFurniture",
+                "specifiedAreaOrSetting", "timeOfDay", "answerMasking", "colorContrast",
+                "textToSpeechForMathematics", "humanReaderOrHumanSignerForMathematics",
+                "aslVideo", "screenReaderOrOtherAssistiveTechnologyApplication",
+                "closedCaptioningForElal", "humanReaderOrHumanSignerForElal",
+                "refreshableBrailleDisplayForElal", "tactileGraphics", "textToSpeechForElal",
+                "answersRecordedInTestBook", "brailleResponse", "calculationDeviceAndMathematicsTools",
+                "elalConstructedResponse", "elalSelectedResponseOrTechnologyEnhancedItems",
+                "mathematicsResponse", "monitorTestResponse", "wordPrediction",
+                "administrationDirectionsClarifiedInStudentsNativeLanguage",
+                "administrationDirectionsReadAloudInStudentsNativeLanguage",
+                "mathematicsResponseEl", "translationOfTheMathematicsAssessmentInTextToSpeech",
+                "translationOfTheMathematicsAssessmentOnline", "wordToWordDictionary",
+                "extendedTime", "alternateRepresentationPaperTest", "translationOfTheMathematicsAssessmentInPaper",
+                "humanReaderOrHumanSigner", "largePrint", "brailleWithTactileGraphics",
+                "optionalStateData2", "optionalStateData3", "optionalStateData4",
+                "optionalStateData5", "optionalStateData6", "optionalStateData7",
+                "optionalStateData8", "filler", "testCode", "assessmentGrade",
+                "subject", "pbaFormId", "eoyFormId", "pbaStudentTestUuid", "eoyStudentTestUuid",
+                "summativeScoreRecordUuid", "pbaTotalTestItems", "pbaTestAttemptednessFlag",
+                "eoyTotalTestItems", "eoyTestAttemptednessFlag", "pbaTotalTestItemsAttempted",
+                "pbaUnit1TotalNumberOfItems", "pbaUnit1NumberOfAttemptedItems",
+                "pbaUnit2TotalNumberOfItems", "pbaUnit2NumberOfAttemptedItems",
+                "pbaUnit3TotalNumberOfItems", "pbaUnit3NumberOfAttemptedItems",
+                "pbaUnit4TotalNumberOfItems", "pbaUnit4NumberOfAttemptedItems",
+                "pbaUnit5TotalNumberOfItems", "pbaUnit5NumberOfAttemptedItems",
+                "eoyTotalTestItemsAttempted", "eoyUnit1TotalNumberOfItems", "eoyUnit1NumberOfAttemptedItems",
+                "eoyUnit2TotalNumberOfItems", "eoyUnit2NumberOfAttemptedItems",
+                "eoyUnit3TotalNumberOfItems", "eoyUnit3NumberOfAttemptedItems",
+                "eoyUnit4TotalNumberOfItems", "eoyUnit4NumberOfAttemptedItems",
+                "eoyUnit5TotalNumberOfItems", "eoyUnit5NumberOfAttemptedItems",
+                "pbaNotTestedReason", "eoyNotTestedReason", "pbaVoidPbaEoyScoreReason",
+                "eoyVoidPbaEoyScoreReason", "filler_1", "filler_2", "summativeScaleScore",
+                "summativeCsem", "summativePerformanceLevel", "summativeReadingScaleScore",
+                "summativeReadingCsem", "summativeWritingScaleScore", "summativeWritingCsem",
+                "subclaim1Category", "subclaim2Category", "subclaim3Category",
+                "subclaim4Category", "subclaim5Category", "subclaim6Category",
+                "filler_3", "filler_4", "filler_5")
 
   NJ_SRF16 <- c("StateAbbreviation", "TestingDistrictCode", "TestingSchoolCode",
-    "ResponsibleDistrictCode", "ResponsibleSchoolCode", "StateStudentIdentifier",
-    "LocalStudentIdentifier", "PARCCStudentIdentifier", "LastOrSurname",
-    "FirstName", "MiddleName", "Birthdate", "Sex", "StateField1",
-    "GradeLevelWhenAssessed", "HispanicOrLatinoEthnicity", "AmericanIndianOrAlaskaNative",
-    "Asian", "BlackOrAfricanAmerican", "NativeHawaiianOrOtherPacificIslander",
-    "White", "FillerField", "TwoOrMoreRaces", "EnglishLearnerEL",
-    "TitleIIILimitedEnglishProficientParticipationStatus", "GiftedandTalented",
-    "MigrantStatus", "EconomicDisadvantageStatus", "StudentWithDisabilities",
-    "PrimaryDisabilityType", "StateField2", "StateField3", "StateField4",
-    "StateField5", "StateField6", "StateField7", "StateField8", "StateField9",
-    "StateField10", "StateField11", "StateField12", "Filler", "ClassName",
-    "TestAdministrator", "StaffMemberIdentifier", "TestCode", "Filler_1",
-    "Retest", "ELAccommodation", "FrequentBreaks", "SeparateAlternateLocation",
-    "SmallTestingGroup", "SpecializedEquipmentOrFurniture", "SpecifiedAreaOrSetting",
-    "TimeOfDay", "AnswerMasking", "FillerField_1", "ColorContrast",
-    "ASLVideo", "AssistiveTechnologyScreenReader", "AssistiveTechnologyNonScreenReader",
-    "ClosedCaptioningForELAL", "RefreshableBrailleDisplayForELAL",
-    "AlternateRepresentationPaperTest", "LargePrint", "BrailleWithTactileGraphics",
-    "StudentReadsAssessmentAloudToThemselves", "HumanSignerForTestDirections",
-    "AnswersRecordedInTestBook", "BrailleResponse", "CalculationDeviceAndMathematicsTools",
-    "ELALConstructedResponse", "ELALSelectedResponseOrTechnologyEnhancedItems",
-    "MathematicsResponse", "MonitorTestResponse", "WordPrediction",
-    "AdministrationDirectionsClarifiedinStudentsNativeLanguage",
-    "AdministrationDirectionsReadAloudinStudentsNativeLanguage",
-    "MathematicsResponseEL", "TranslationOfTheMathematicsAssessment",
-    "WordtoWordDictionaryEnglishNativeLanguage", "TextToSpeech",
-    "HumanReaderOrHumanSigner", "UniqueAccommodation", "EmergencyAccommodation",
-    "ExtendedTime", "StudentTestUUID", "PaperFormID", "OnlineFormID",
-    "TestStatus", "TotalTestItems", "TestAttemptednessFlag", "TotalTestItemsAttempted",
-    "PaperUnit1TotalTestItems", "PaperSection1NumberofAttemptedItems",
-    "PaperSection2TotalTestItems", "PaperSection2NumberofAttemptedItems",
-    "PaperSection3TotalTestItems", "PaperSection3NumberofAttemptedItems",
-    "PaperSection4TotalTestItems", "PaperSection4NumberofAttemptedItems",
-    "StudentUnit1TestUUID", "Unit1FormID", "Unit1TotalTestItems",
-    "Unit1NumberofAttemptedItems", "StudentUnit2TestUUID", "Unit2FormID",
-    "Unit2TotalTestItems", "Unit2NumberOfAttemptedItems", "StudentUnit3TestUUID",
-    "Unit3FormID", "Unit3TotalTestItems", "Unit3NumberOfAttemptedItems",
-    "StudentUnit4TestUUID", "Unit4FormID", "Unit4TotalTestItems",
-    "Unit4NumberofAttemptedItems", "NotTestedCode", "NotTestedReason",
-    "VoidScoreCode", "VoidScoreReason", "ShipReportDistrictCode",
-    "ShipReportSchoolCode", "Summative Flag", "MultipleTestRegistration",
-    "RosterFlag", "ReportSuppressionCode", "ReportSuppressionAction",
-    "AttemptCreateDate", "Unit1OnlineTestStartDateTime", "Unit1OnlineTestEndDateTime",
-    "Unit2OnlineTestStartDateTime", "Unit2OnlineTestEndDateTime",
-    "Unit3OnlineTestStartDateTime", "Unit3OnlineTestEndDateTime",
-    "Unit4OnlineTestStartDateTime", "Unit4OnlineTestEndDateTime",
-    "AssessmentYear", "AssessmentGrade", "Subject", "FederalRaceEthnicity",
-    "Period", "TestingOrganizationalType", "TestingDistrictName",
-    "TestingSchoolName", "ResponsibleOrganizationCodeType", "ResponsibleDistrictName",
-    "ResponsibleSchoolName", "Filler_2", "Filler_3", "Filler_4",
-    "Filler_5", "Filler_6", "Filler_7", "TestScaleScore", "TestCSEMProbableRange",
-    "TestPerformanceLevel", "TestReadingScaleScore", "TestReadingCSEM",
-    "TestWritingScaleScore", "TestWritingCSEM", "Subclaim1Category",
-    "Subclaim2Category", "Subclaim3Category", "Subclaim4Category",
-    "Subclaim5Category", "Subclaim6Category", "Filler_8", "Filler_9",
-    "Filler_10", "Filler_11", "TestScoreComplete"
+                "ResponsibleDistrictCode", "ResponsibleSchoolCode", "StateStudentIdentifier",
+                "LocalStudentIdentifier", "PARCCStudentIdentifier", "LastOrSurname",
+                "FirstName", "MiddleName", "Birthdate", "Sex", "StateField1",
+                "GradeLevelWhenAssessed", "HispanicOrLatinoEthnicity", "AmericanIndianOrAlaskaNative",
+                "Asian", "BlackOrAfricanAmerican", "NativeHawaiianOrOtherPacificIslander",
+                "White", "FillerField", "TwoOrMoreRaces", "EnglishLearnerEL",
+                "TitleIIILimitedEnglishProficientParticipationStatus", "GiftedandTalented",
+                "MigrantStatus", "EconomicDisadvantageStatus", "StudentWithDisabilities",
+                "PrimaryDisabilityType", "StateField2", "StateField3", "StateField4",
+                "StateField5", "StateField6", "StateField7", "StateField8", "StateField9",
+                "StateField10", "StateField11", "StateField12", "Filler", "ClassName",
+                "TestAdministrator", "StaffMemberIdentifier", "TestCode", "Filler_1",
+                "Retest", "ELAccommodation", "FrequentBreaks", "SeparateAlternateLocation",
+                "SmallTestingGroup", "SpecializedEquipmentOrFurniture", "SpecifiedAreaOrSetting",
+                "TimeOfDay", "AnswerMasking", "FillerField_1", "ColorContrast",
+                "ASLVideo", "AssistiveTechnologyScreenReader", "AssistiveTechnologyNonScreenReader",
+                "ClosedCaptioningForELAL", "RefreshableBrailleDisplayForELAL",
+                "AlternateRepresentationPaperTest", "LargePrint", "BrailleWithTactileGraphics",
+                "StudentReadsAssessmentAloudToThemselves", "HumanSignerForTestDirections",
+                "AnswersRecordedInTestBook", "BrailleResponse", "CalculationDeviceAndMathematicsTools",
+                "ELALConstructedResponse", "ELALSelectedResponseOrTechnologyEnhancedItems",
+                "MathematicsResponse", "MonitorTestResponse", "WordPrediction",
+                "AdministrationDirectionsClarifiedinStudentsNativeLanguage",
+                "AdministrationDirectionsReadAloudinStudentsNativeLanguage",
+                "MathematicsResponseEL", "TranslationOfTheMathematicsAssessment",
+                "WordtoWordDictionaryEnglishNativeLanguage", "TextToSpeech",
+                "HumanReaderOrHumanSigner", "UniqueAccommodation", "EmergencyAccommodation",
+                "ExtendedTime", "StudentTestUUID", "PaperFormID", "OnlineFormID",
+                "TestStatus", "TotalTestItems", "TestAttemptednessFlag", "TotalTestItemsAttempted",
+                "PaperUnit1TotalTestItems", "PaperSection1NumberofAttemptedItems",
+                "PaperSection2TotalTestItems", "PaperSection2NumberofAttemptedItems",
+                "PaperSection3TotalTestItems", "PaperSection3NumberofAttemptedItems",
+                "PaperSection4TotalTestItems", "PaperSection4NumberofAttemptedItems",
+                "StudentUnit1TestUUID", "Unit1FormID", "Unit1TotalTestItems",
+                "Unit1NumberofAttemptedItems", "StudentUnit2TestUUID", "Unit2FormID",
+                "Unit2TotalTestItems", "Unit2NumberOfAttemptedItems", "StudentUnit3TestUUID",
+                "Unit3FormID", "Unit3TotalTestItems", "Unit3NumberOfAttemptedItems",
+                "StudentUnit4TestUUID", "Unit4FormID", "Unit4TotalTestItems",
+                "Unit4NumberofAttemptedItems", "NotTestedCode", "NotTestedReason",
+                "VoidScoreCode", "VoidScoreReason", "ShipReportDistrictCode",
+                "ShipReportSchoolCode", "Summative Flag", "MultipleTestRegistration",
+                "RosterFlag", "ReportSuppressionCode", "ReportSuppressionAction",
+                "AttemptCreateDate", "Unit1OnlineTestStartDateTime", "Unit1OnlineTestEndDateTime",
+                "Unit2OnlineTestStartDateTime", "Unit2OnlineTestEndDateTime",
+                "Unit3OnlineTestStartDateTime", "Unit3OnlineTestEndDateTime",
+                "Unit4OnlineTestStartDateTime", "Unit4OnlineTestEndDateTime",
+                "AssessmentYear", "AssessmentGrade", "Subject", "FederalRaceEthnicity",
+                "Period", "TestingOrganizationalType", "TestingDistrictName",
+                "TestingSchoolName", "ResponsibleOrganizationCodeType", "ResponsibleDistrictName",
+                "ResponsibleSchoolName", "Filler_2", "Filler_3", "Filler_4",
+                "Filler_5", "Filler_6", "Filler_7", "TestScaleScore", "TestCSEMProbableRange",
+                "TestPerformanceLevel", "TestReadingScaleScore", "TestReadingCSEM",
+                "TestWritingScaleScore", "TestWritingCSEM", "Subclaim1Category",
+                "Subclaim2Category", "Subclaim3Category", "Subclaim4Category",
+                "Subclaim5Category", "Subclaim6Category", "Filler_8", "Filler_9",
+                "Filler_10", "Filler_11", "TestScoreComplete"
   )
 
   NJ_SRF17 <- c("StateAbbreviation", "TestingDistrictCode", "TestingSchoolCode",
-     "ResponsibleDistrictCode", "ResponsibleSchoolCode", "StateStudentIdentifier",
-     "LocalStudentIdentifier", "PARCCStudentIdentifier", "LastOrSurname",
-     "FirstName", "MiddleName", "Birthdate", "Sex", "StateField1",
-     "GradeLevelWhenAssessed", "HispanicOrLatinoEthnicity", "AmericanIndianOrAlaskaNative",
-     "Asian", "BlackOrAfricanAmerican", "NativeHawaiianOrOtherPacificIslander",
-     "White", "FillerField1", "TwoOrMoreRaces", "EnglishLearnerEL",
-     "TitleIIILimitedEnglishProficientParticipationStatus", "GiftedandTalented",
-     "MigrantStatus", "EconomicDisadvantageStatus", "StudentWithDisabilities",
-     "PrimaryDisabilityType", "StateField2", "StateField3", "StateField4",
-     "StateField5", "StateField6", "StateField7", "StateField8", "StateField9",
-     "StateField10", "StateField11", "StateField12", "FillerField2",
-     "ClassName", "TestAdministrator", "StaffMemberIdentifier", "TestCode",
-     "FillerField", "Retest", "FillerField_1", "FrequentBreaks", "SeparateAlternateLocation",
-     "SmallTestingGroup", "SpecializedEquipmentOrFurniture", "SpecifiedAreaOrSetting",
-     "TimeOfDay", "AnswerMasking", "StudentReadsAssessmentAloudToThemselves",
-     "ColorContrast", "ASLVideo", "AssistiveTechnologyScreenReader",
-     "AssistiveTechnologyNonScreenReader", "ClosedCaptioningForELAL",
-     "RefreshableBrailleDisplayForELAL", "AlternateRepresentationPaperTest",
-     "LargePrint", "BrailleWithTactileGraphics", "FillerField4", "HumanSignerForTestDirections",
-     "AnswersRecordedInTestBook", "BrailleResponse", "CalculationDeviceAndMathematicsTools",
-     "ELALConstructedResponse", "ELALSelectedResponseOrTechnologyEnhancedItems",
-     "MathematicsResponse", "MonitorTestResponse", "WordPredictionForELAL",
-     "AdministrationDirectionsClarifiedinStudentsNativeLanguage",
-     "AdministrationDirectionsReadAloudinStudentsNativeLanguage",
-     "MathematicsResponseEL", "SpanishTransadaptationOfTheMathematicsAssessment",
-     "WordtoWordDictionaryEnglishNativeLanguage", "TextToSpeech",
-     "HumanReaderOrHumanSigner", "UniqueAccommodation", "EmergencyAccommodation",
-     "ExtendedTime", "StudentTestUUID", "PaperFormID", "OnlineFormID",
-     "TestStatus", "TotalTestItems", "TestAttemptednessFlag", "TotalTestItemsAttempted",
-     "PaperSection1TotalTestItems", "PaperSection1NumberofAttemptedItems",
-     "PaperSection2TotalTestItems", "PaperSection2NumberofAttemptedItems",
-     "PaperSection3TotalTestItems", "PaperSection3NumberofAttemptedItems",
-     "PaperSection4TotalTestItems", "PaperSection4NumberofAttemptedItems",
-     "StudentUnit1TestUUID", "Unit1FormID", "Unit1TotalTestItems",
-     "Unit1NumberofAttemptedItems", "StudentUnit2TestUUID", "Unit2FormID",
-     "Unit2TotalTestItems", "Unit2NumberOfAttemptedItems", "StudentUnit3TestUUID",
-     "Unit3FormID", "Unit3TotalTestItems", "Unit3NumberOfAttemptedItems",
-     "StudentUnit4TestUUID", "Unit4FormID", "Unit4TotalTestItems",
-     "Unit4NumberofAttemptedItems", "NotTestedCode", "NotTestedReason",
-     "VoidScoreCode", "VoidScoreReason", "ShipReportDistrictCode",
-     "ShipReportSchoolCode", "SummativeFlag", "MultipleTestRegistration",
-     "RosterFlag", "ReportSuppressionCode", "ReportSuppressionAction",
-     "PaperAttemptCreateDate", "Unit1OnlineTestStartDateTime", "Unit1OnlineTestEndDateTime",
-     "Unit2OnlineTestStartDateTime", "Unit2OnlineTestEndDateTime",
-     "Unit3OnlineTestStartDateTime", "Unit3OnlineTestEndDateTime",
-     "Unit4OnlineTestStartDateTime", "Unit4OnlineTestEndDateTime",
-     "AssessmentYear", "AssessmentGrade", "Subject", "FederalRaceEthnicity",
-     "Period", "TestingOrganizationalType", "TestingDistrictName",
-     "TestingSchoolName", "ResponsibleOrganizationalType", "ResponsibleDistrictName",
-     "ResponsibleSchoolName", "FillerField_2", "FillerField_3", "FillerField_4",
-     "FillerField_5", "FillerField_6", "FillerField_7", "TestScaleScore",
-     "TestCSEMProbableRange", "TestPerformanceLevel", "TestReadingScaleScore",
-     "TestReadingCSEM", "TestWritingScaleScore", "TestWritingCSEM",
-     "Subclaim1Category", "Subclaim2Category", "Subclaim3Category",
-     "Subclaim4Category", "Subclaim5Category", "FillerField5", "FillerField_8",
-     "FillerField_9", "FillerField_10", "FillerField_11", "TestScoreComplete",
-     "FillerField_12", "FillerField_13", "FillerField_14", "FillerField_15",
-     "FillerField_16", "FillerField_17", "FillerField_18", "FillerField_19",
-     "FillerField_20", "FillerField_21", "FillerField_22", "FillerField_23",
-     "FillerField_24", "FillerField_25", "FillerField_26", "FillerField_27",
-     "FillerField7", "FillerField_28", "FillerField_29", "FillerField_30"
+                "ResponsibleDistrictCode", "ResponsibleSchoolCode", "StateStudentIdentifier",
+                "LocalStudentIdentifier", "PARCCStudentIdentifier", "LastOrSurname",
+                "FirstName", "MiddleName", "Birthdate", "Sex", "StateField1",
+                "GradeLevelWhenAssessed", "HispanicOrLatinoEthnicity", "AmericanIndianOrAlaskaNative",
+                "Asian", "BlackOrAfricanAmerican", "NativeHawaiianOrOtherPacificIslander",
+                "White", "FillerField1", "TwoOrMoreRaces", "EnglishLearnerEL",
+                "TitleIIILimitedEnglishProficientParticipationStatus", "GiftedandTalented",
+                "MigrantStatus", "EconomicDisadvantageStatus", "StudentWithDisabilities",
+                "PrimaryDisabilityType", "StateField2", "StateField3", "StateField4",
+                "StateField5", "StateField6", "StateField7", "StateField8", "StateField9",
+                "StateField10", "StateField11", "StateField12", "FillerField2",
+                "ClassName", "TestAdministrator", "StaffMemberIdentifier", "TestCode",
+                "FillerField", "Retest", "FillerField_1", "FrequentBreaks", "SeparateAlternateLocation",
+                "SmallTestingGroup", "SpecializedEquipmentOrFurniture", "SpecifiedAreaOrSetting",
+                "TimeOfDay", "AnswerMasking", "StudentReadsAssessmentAloudToThemselves",
+                "ColorContrast", "ASLVideo", "AssistiveTechnologyScreenReader",
+                "AssistiveTechnologyNonScreenReader", "ClosedCaptioningForELAL",
+                "RefreshableBrailleDisplayForELAL", "AlternateRepresentationPaperTest",
+                "LargePrint", "BrailleWithTactileGraphics", "FillerField4", "HumanSignerForTestDirections",
+                "AnswersRecordedInTestBook", "BrailleResponse", "CalculationDeviceAndMathematicsTools",
+                "ELALConstructedResponse", "ELALSelectedResponseOrTechnologyEnhancedItems",
+                "MathematicsResponse", "MonitorTestResponse", "WordPredictionForELAL",
+                "AdministrationDirectionsClarifiedinStudentsNativeLanguage",
+                "AdministrationDirectionsReadAloudinStudentsNativeLanguage",
+                "MathematicsResponseEL", "SpanishTransadaptationOfTheMathematicsAssessment",
+                "WordtoWordDictionaryEnglishNativeLanguage", "TextToSpeech",
+                "HumanReaderOrHumanSigner", "UniqueAccommodation", "EmergencyAccommodation",
+                "ExtendedTime", "StudentTestUUID", "PaperFormID", "OnlineFormID",
+                "TestStatus", "TotalTestItems", "TestAttemptednessFlag", "TotalTestItemsAttempted",
+                "PaperSection1TotalTestItems", "PaperSection1NumberofAttemptedItems",
+                "PaperSection2TotalTestItems", "PaperSection2NumberofAttemptedItems",
+                "PaperSection3TotalTestItems", "PaperSection3NumberofAttemptedItems",
+                "PaperSection4TotalTestItems", "PaperSection4NumberofAttemptedItems",
+                "StudentUnit1TestUUID", "Unit1FormID", "Unit1TotalTestItems",
+                "Unit1NumberofAttemptedItems", "StudentUnit2TestUUID", "Unit2FormID",
+                "Unit2TotalTestItems", "Unit2NumberOfAttemptedItems", "StudentUnit3TestUUID",
+                "Unit3FormID", "Unit3TotalTestItems", "Unit3NumberOfAttemptedItems",
+                "StudentUnit4TestUUID", "Unit4FormID", "Unit4TotalTestItems",
+                "Unit4NumberofAttemptedItems", "NotTestedCode", "NotTestedReason",
+                "VoidScoreCode", "VoidScoreReason", "ShipReportDistrictCode",
+                "ShipReportSchoolCode", "SummativeFlag", "MultipleTestRegistration",
+                "RosterFlag", "ReportSuppressionCode", "ReportSuppressionAction",
+                "PaperAttemptCreateDate", "Unit1OnlineTestStartDateTime", "Unit1OnlineTestEndDateTime",
+                "Unit2OnlineTestStartDateTime", "Unit2OnlineTestEndDateTime",
+                "Unit3OnlineTestStartDateTime", "Unit3OnlineTestEndDateTime",
+                "Unit4OnlineTestStartDateTime", "Unit4OnlineTestEndDateTime",
+                "AssessmentYear", "AssessmentGrade", "Subject", "FederalRaceEthnicity",
+                "Period", "TestingOrganizationalType", "TestingDistrictName",
+                "TestingSchoolName", "ResponsibleOrganizationalType", "ResponsibleDistrictName",
+                "ResponsibleSchoolName", "FillerField_2", "FillerField_3", "FillerField_4",
+                "FillerField_5", "FillerField_6", "FillerField_7", "TestScaleScore",
+                "TestCSEMProbableRange", "TestPerformanceLevel", "TestReadingScaleScore",
+                "TestReadingCSEM", "TestWritingScaleScore", "TestWritingCSEM",
+                "Subclaim1Category", "Subclaim2Category", "Subclaim3Category",
+                "Subclaim4Category", "Subclaim5Category", "FillerField5", "FillerField_8",
+                "FillerField_9", "FillerField_10", "FillerField_11", "TestScoreComplete",
+                "FillerField_12", "FillerField_13", "FillerField_14", "FillerField_15",
+                "FillerField_16", "FillerField_17", "FillerField_18", "FillerField_19",
+                "FillerField_20", "FillerField_21", "FillerField_22", "FillerField_23",
+                "FillerField_24", "FillerField_25", "FillerField_26", "FillerField_27",
+                "FillerField7", "FillerField_28", "FillerField_29", "FillerField_30"
   )
 
   results_files <- list(
@@ -330,10 +329,10 @@ read_results_file <- function(path, format) {
 #'
 #' @return data.frame/tbl
 
-basic_read <- function(path) {
+basic_read_and_clean <- function(path) {
   df <- suppressMessages(suppressWarnings(
     readr::read_csv(path) %>%
-    janitor::clean_names()
+      janitor::clean_names()
   ))
 
   #remove all filler columns per issue #4
@@ -360,8 +359,6 @@ basic_read <- function(path) {
   names(df) <- gsub('school_identifier', 'school_code', names(df))
 
 
-
-
   #common cleaning for fields in ALL srfs
   #make several columns character
   df <- df %>%
@@ -369,6 +366,10 @@ basic_read <- function(path) {
       .vars = vars(local_student_identifier,
                    state_field8),
       as.character
+    ) %>%
+    #convert assessment year to end year
+    mutate(
+      end_year = str_extract(assessment_year, '[[:digit:]]{4}$')
     )
 
   df
@@ -429,20 +430,20 @@ clean_nj_2016_plus <- function(df) {
 
 #' Process a NJ SRF file (any year)
 #'
-#' @inheritParams basic_read
+#' @inheritParams basic_read_and_clean
 #'
 #' @return data.frame/tbl
 #' @export
 
 process_nj_srf15 <- function(path) {
-  basic_read(path)
+  basic_read_and_clean(path)
 }
 
 #' @rdname process_nj_srf15
 #' @export
 
 process_nj_srf16 <- function(path) {
-  df <- basic_read(path)
+  df <- basic_read_and_clean(path)
   clean_nj_2016_plus(df)
 }
 
@@ -450,7 +451,7 @@ process_nj_srf16 <- function(path) {
 #' @export
 
 process_nj_srf17 <- function(path) {
-  df <- basic_read(path)
+  df <- basic_read_and_clean(path)
   clean_nj_2016_plus(df)
 }
 
@@ -458,6 +459,6 @@ process_nj_srf17 <- function(path) {
 #' @export
 
 process_nj_srf18 <- function(path) {
-  df <- basic_read(path)
+  df <- basic_read_and_clean(path)
   clean_nj_2016_plus(df)
 }
