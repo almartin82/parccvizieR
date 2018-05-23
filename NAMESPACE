@@ -2,6 +2,7 @@
 
 S3method(parccvizieR,default)
 export(clean_nj_2016_plus)
+export(cohort_year)
 export(detect_result_file_layout)
 export(parccvizieR)
 export(process_nj_srf15)
