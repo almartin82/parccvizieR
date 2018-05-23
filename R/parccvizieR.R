@@ -360,16 +360,39 @@ basic_read_and_clean <- function(path) {
 
 
   #common cleaning for fields in ALL srfs
-  #make several columns character
   df <- df %>%
+    #make several columns character
     mutate_at(
       .vars = vars(local_student_identifier,
                    state_field8),
       as.character
     ) %>%
+    #make columns numeric
+    mutate_at(
+      .vars = vars(grade_level_when_assessed),
+      as.numeric
+    ) %>%
     #convert assessment year to end year
     mutate(
-      end_year = str_extract(assessment_year, '[[:digit:]]{4}$')
+      end_year = str_extract(assessment_year, '[[:digit:]]{4}$'),
+      end_year = as.numeric(end_year)
+    ) %>%
+    #create assessment grade numeric for analyzing by test took
+    mutate(
+      assessment_grade_numeric = gsub(
+        'Grade ', '', assessment_grade
+      ) %>% as.numeric()
+    ) %>%
+    #if grade is 99 (missing?  graduated?) use the assessment grade instead
+    mutate(
+      grade_level_when_assessed = case_when(
+        grade_level_when_assessed < 99 ~ grade_level_when_assessed,
+        grade_level_when_assessed == 99 ~ assessment_grade_numeric
+      )
+    ) %>%
+    #add in cohort year per #12
+    mutate(
+      cohort = cohort_year(end_year, grade_level_when_assessed)
     )
 
   df
