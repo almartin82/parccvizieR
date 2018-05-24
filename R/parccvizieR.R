@@ -485,3 +485,41 @@ process_nj_srf18 <- function(path) {
   df <- basic_read_and_clean(path)
   clean_nj_2016_plus(df)
 }
+
+
+#' Title print method for\code{parccvizier} class
+#' @description prints to console
+#' @param x a \code{parccvizier} object
+#' @param ... additional arguments
+#' @rdname print
+#' @return some details about the object to the console
+#' @export
+
+print.parccvizieR <-  function(x, ...) {
+
+  #gather some summary stats
+  n_df <- length(x)
+  n_sy <- length(unique(x$srf$end_year))
+  min_sy <- min(x$srf$end_year)
+  max_sy <- max(x$srf$end_year)
+  n_students <- length(unique(x$srf$StateStudentIdentifier))
+  n_schools <- length(unique(x$srf$TestingSchoolName))
+  growthseasons <- unique(x$growth_df$growth_window)
+  n_growthseasons <- length(growthseasons)
+
+  cat("A parccvizieR object repesenting:\n- ")
+  cat(paste(n_sy))
+  cat(" school years from SY")
+  cat(paste(min_sy))
+  cat(" to SY")
+  cat(paste(max_sy))
+  cat(";\n- ")
+  cat(paste(n_students))
+  cat(" students from ")
+  cat(paste(n_schools))
+  cat(" schools;\n- and, ")
+  cat(paste(n_growthseasons))
+  cat(" growth seasons:\n    ")
+  cat(paste(growthseasons, collapse = ",\n    "))
+}
+
