@@ -39,7 +39,7 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...
   out <- list()
 
   #use map2df on the list of files and list of layouts to process the data
-  out$raw <- map2_df(
+  out$srf <- map2_df(
     .x = raw_files,
     .y = file_layouts,
     .f = ~read_results_file(.x, .y)
@@ -363,7 +363,8 @@ basic_read_and_clean <- function(path) {
   df <- df %>%
     #make several columns character
     mutate_at(
-      .vars = vars(local_student_identifier,
+      .vars = vars(state_student_identifier,
+                   local_student_identifier,
                    state_field8),
       as.character
     ) %>%
@@ -374,8 +375,8 @@ basic_read_and_clean <- function(path) {
     ) %>%
     #convert assessment year to end year
     mutate(
-      end_year = str_extract(assessment_year, '[[:digit:]]{4}$'),
-      end_year = as.numeric(end_year)
+      academic_year = str_extract(assessment_year, '[[:digit:]]{4}$'),
+      academic_year = as.numeric(academic_year)
     ) %>%
     #create assessment grade numeric for analyzing by test took
     mutate(
@@ -392,7 +393,11 @@ basic_read_and_clean <- function(path) {
     ) %>%
     #add in cohort year per #12
     mutate(
-      cohort = cohort_year(end_year, grade_level_when_assessed)
+      cohort = cohort_year(academic_year, grade_level_when_assessed)
+    ) %>%
+    #determine the subject area
+    mutate(
+      subject_area = subject_area(subject)
     )
 
   df
@@ -451,6 +456,26 @@ clean_nj_2016_plus <- function(df) {
   df
 }
 
+
+#' Determine Test Subject Area
+#'
+#' @param x a vector of subjects
+#'
+#' @return vector of subject areas
+#' @export
+
+subject_area <- function(x) {
+  case_when(
+    x == 'English Language Arts/Literacy' ~ "ELA",
+    x == 'Algebra I' ~ "Math",
+    x == 'Algebra II' ~ "Math",
+    x == 'Geometry' ~ "Math",
+    x == 'Mathematics' ~ "Math",
+    x == 'Integrated Mathematics I ' ~ "Math"
+  )
+}
+
+
 #' Process a NJ SRF file (any year)
 #'
 #' @inheritParams basic_read_and_clean
@@ -499,13 +524,14 @@ print.parccvizieR <-  function(x, ...) {
 
   #gather some summary stats
   n_df <- length(x)
-  n_sy <- length(unique(x$srf$end_year))
-  min_sy <- min(x$srf$end_year)
-  max_sy <- max(x$srf$end_year)
-  n_students <- length(unique(x$srf$StateStudentIdentifier))
-  n_schools <- length(unique(x$srf$TestingSchoolName))
-  growthseasons <- unique(x$growth_df$growth_window)
-  n_growthseasons <- length(growthseasons)
+  n_sy <- length(unique(x$srf$academic_year))
+  min_sy <- min(x$srf$academic_year)
+  max_sy <- max(x$srf$academic_year)
+  n_students <- length(unique(x$srf$state_student_identifier))
+  n_schools <- length(unique(x$srf$responsible_school_name))
+
+  #growthseasons <- unique(x$growth_df$growth_window)
+  #n_growthseasons <- length(growthseasons)
 
   cat("A parccvizieR object repesenting:\n- ")
   cat(paste(n_sy))
@@ -518,8 +544,8 @@ print.parccvizieR <-  function(x, ...) {
   cat(" students from ")
   cat(paste(n_schools))
   cat(" schools;\n- and, ")
-  cat(paste(n_growthseasons))
-  cat(" growth seasons:\n    ")
-  cat(paste(growthseasons, collapse = ",\n    "))
+  #cat(paste(n_growthseasons))
+  #cat(" growth seasons:\n    ")
+  #cat(paste(growthseasons, collapse = ",\n    "))
 }
 
