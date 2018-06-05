@@ -17,7 +17,7 @@ build_growth_df(srf, start, end, verbose = TRUE)
 default is TRUE}
 }
 \value{
-growth data frame
+growth data frame covering one year
 }
 \description{
 Build a growth df, given a start and end year

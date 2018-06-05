@@ -1,8 +1,15 @@
+#' Generate growth data
+#'
+#' @param a PARCC summative record file.  assumes one row per student
+#' per test code per year (eg output of dedupe_srf)
+#'
+#' @return data frame with multiple years of growth data
+#' @export
 
-generate_growth_data <- function(pv) {
+generate_growth_data <- function(srf) {
 
   #determine all of the academic years
-  unq_years <- unique(pv$srf$academic_year)
+  unq_years <- unique(srf$academic_year)
   unq_years <- c(unq_years, min(unq_years) - 1) %>% sort()
 
   #build growth df
@@ -12,12 +19,18 @@ generate_growth_data <- function(pv) {
   )
 
   #calculate growth metrics
-
-
-  #add in cohort
+  growth_df <- growth_df %>%
+    mutate(
+      scale_score_change = end_test_scale_score - start_test_scale_score,
+      performance_level_change = end_test_performance_level - start_test_performance_level
+    ) %>%
+    #add in cohort
+    mutate(
+      cohort_year = cohort_year(end_academic_year, end_student_grade)
+    )
 
   #return
-
+  growth_df
 }
 
 
@@ -29,7 +42,7 @@ generate_growth_data <- function(pv) {
 #' @param verbose print status updates as the data is processed?
 #' default is TRUE
 #'
-#' @return growth data frame
+#' @return growth data frame covering one year
 #' @export
 
 build_growth_df <- function(srf, start, end, verbose = TRUE) {
@@ -79,6 +92,7 @@ build_growth_df <- function(srf, start, end, verbose = TRUE) {
     start_srf, end_srf[,c(5:13)], by = c('target_end_key'='end_key')
   ) %>%
   mutate(
+    growth_window = paste0(start, ' - ', end),
     match_status = 'start and end',
     complete_obsv = TRUE
   )
@@ -89,7 +103,7 @@ build_growth_df <- function(srf, start, end, verbose = TRUE) {
   ) %>%
   mutate(
     end_academic_year = end,
-    end_subject = subject_area(next_test),
+    growth_window = NA_character_,
     match_status = 'only_start',
     complete_obsv = FALSE
   ) %>%
@@ -105,7 +119,7 @@ build_growth_df <- function(srf, start, end, verbose = TRUE) {
   mutate(
     start_academic_year = start,
     start_test_code = prior_test(end_test_code),
-    start_subject = subject_area(start_test_code),
+    growth_window = NA_character_,
     match_status = 'only_end',
     complete_obsv = FALSE
   ) %>%

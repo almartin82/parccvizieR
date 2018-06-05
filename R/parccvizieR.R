@@ -52,7 +52,7 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...
     select(-rn)
 
   #make the growth object
-
+  out$growth_df <- generate_growth_data(out$srf)
 
   #return parccvizieR object
   class(out) <- "parccvizieR"
@@ -539,8 +539,8 @@ print.parccvizieR <-  function(x, ...) {
   n_students <- length(unique(x$srf$state_student_identifier))
   n_schools <- length(unique(x$srf$responsible_school_name))
 
-  #growthseasons <- unique(x$growth_df$growth_window)
-  #n_growthseasons <- length(growthseasons)
+  growthseasons <- table(x$growth_df$growth_window) %>% names()
+  n_growthseasons <- length(growthseasons)
 
   cat("A parccvizieR object repesenting:\n- ")
   cat(paste(n_sy))
@@ -550,11 +550,11 @@ print.parccvizieR <-  function(x, ...) {
   cat(paste(max_sy))
   cat(";\n- ")
   cat(paste(n_students))
-  cat(" students from ")
+  cat(" unique students from ")
   cat(paste(n_schools))
-  cat(" schools;\n- and, ")
-  #cat(paste(n_growthseasons))
-  #cat(" growth seasons:\n    ")
-  #cat(paste(growthseasons, collapse = ",\n    "))
+  cat(" unique schools;\n- and, ")
+  cat(paste(n_growthseasons))
+  cat(" growth seasons:\n    ")
+  cat(paste(growthseasons, collapse = ",\n    "))
 }
 
