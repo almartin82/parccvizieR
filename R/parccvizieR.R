@@ -38,12 +38,18 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...
   #list to house all of the parccvizieR data objects
   out <- list()
 
-  #use map2df on the list of files and list of layouts to process the data
-  out$srf <- map2_df(
+  #use map2df on the list of files and list of layouts to
+  # process the data
+  out$raw <- map2_df(
     .x = raw_files,
     .y = file_layouts,
     .f = ~read_results_file(.x, .y)
   )
+
+  #determine the best record to keep and return that as the srf object
+  out$srf <- dedupe_srf(out$raw) %>%
+    filter(rn == 1) %>%
+    select(-rn)
 
   #return parccvizieR object
   class(out) <- "parccvizieR"
