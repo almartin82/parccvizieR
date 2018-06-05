@@ -1,7 +1,7 @@
 Package: parccvizieR
 Type: Package
 Title: Analysis and visualization tools for the PARCC Assessment
-Version: 0.2
+Version: 0.3
 Date: 2015-11-18
 Authors@R: c(
   person("Andrew", "Martin", role = c("aut","cre"), email = "almartin@gmail.com"),
