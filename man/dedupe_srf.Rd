@@ -4,10 +4,10 @@
 \alias{dedupe_srf}
 \title{Dedupe a SRF to return one row per studentid per testcode per year}
 \usage{
-dedupe_srf(pv_srf)
+dedupe_srf(srf)
 }
 \arguments{
-\item{pv_srf}{a parcvizieR summative record file}
+\item{srf}{a parcvizieR summative record file}
 }
 \value{
 SRF with a rn column where 1 = best test record to use
