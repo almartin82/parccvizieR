@@ -33,11 +33,11 @@ build_growth_scaffold <- function(pv_srf, start, end) {
       student_grade = grade_level_when_assessed
     ) %>%
     mutate(
-      key = paste(parcc_student_identifier, test_code, sep = '_')
+      key = paste(state_student_identifier, test_code, sep = '_')
     )
 
-  start_srf <- pv_srf %>% filter(academic_year == start)
-  end_srf <- pv_srf %>% filter(academic_year == end)
+  start_srf <- simple %>% filter(academic_year == start)
+  end_srf <- simple %>% filter(academic_year == end)
 
   #define the columns for the output
   #this lets us return a zero-length data frame if there's no
@@ -54,17 +54,22 @@ build_growth_scaffold <- function(pv_srf, start, end) {
     start_student_grade = integer(),
     start_subject = character(),
     start_test_code = character(),
+    start_test_scale_score = integer(),
+    start_test_performance_level = integer(),
+
     end_year = integer(),
     end_responsible_school_code = character(),
     end_responsible_school_name = character(),
     end_assessment_grade = integer(),
     end_student_grade = integer(),
     end_subject = character(),
-    end_test_code = character()
+    end_test_code = character(),
+    end_test_scale_score = integer(),
+    end_test_performance_level = integer()
   )
 
   #empty tibble
-  empty <- as.tibble(output_cols)
+  empty <- as_tibble(output_cols)
 
   #if there's no data, don't worry about matching; just return a zero row df
   if (nrow(start_srf) == 0) {
@@ -78,10 +83,10 @@ build_growth_scaffold <- function(pv_srf, start, end) {
   names(end_srf) <- paste0(end_prefixes, names(end_srf))
 
   #using start, make a key of the matching end row
-  start <- start %>%
+  start_srf <- start_srf %>%
     mutate(
-      next_test = next_test(test_code),
-      target_end_key = paste0(parcc_student_identifier, next_test, sep = '_')
+      next_test = next_test(start_test_code),
+      target_end_key = paste(state_student_identifier, next_test, sep = '_')
     )
 
   matched_rows <- inner_join(
