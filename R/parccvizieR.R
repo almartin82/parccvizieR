@@ -51,6 +51,9 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...
     filter(rn == 1) %>%
     select(-rn)
 
+  #make the growth object
+
+
   #return parccvizieR object
   class(out) <- "parccvizieR"
 

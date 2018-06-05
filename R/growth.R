@@ -1,9 +1,18 @@
 
 generate_growth_data <- function(pv) {
 
-  #generate a scaffoldd
+  #determine all of the academic years
+  unq_years <- unique(pv$srf$academic_year)
+  unq_years <- c(unq_years, min(unq_years) - 1) %>% sort()
 
-  #match start/end testids in parccviz clean object
+  #build growth df
+  growth_df <- map_df(
+    .x = unq_years,
+    .f = function(.x) build_growth_df(pv$srf, .x, .x + 1)
+  )
+
+  #calculate growth metrics
+
 
   #add in cohort
 
@@ -11,10 +20,22 @@ generate_growth_data <- function(pv) {
 
 }
 
-build_growth_scaffold <- function(pv_srf, start, end) {
+
+#' Build a growth df, given a start and end year
+#'
+#' @param srf a PARCC summative record file
+#' @param start start academic year
+#' @param end end academic year
+#' @param verbose print status updates as the data is processed?
+#' default is TRUE
+#'
+#' @return growth data frame
+#' @export
+
+build_growth_df <- function(srf, start, end, verbose = TRUE) {
 
   #limited srf
-  simple <- pv_srf %>%
+  simple <- srf %>%
     select(
       parcc_student_identifier,
       state_student_identifier,
@@ -25,8 +46,9 @@ build_growth_scaffold <- function(pv_srf, start, end) {
       responsible_school_name,
       assessment_grade_numeric,
       grade_level_when_assessed,
-      subject,
-      test_code
+      test_code,
+      test_scale_score,
+      test_performance_level
     ) %>%
     rename(
       assessment_grade = assessment_grade_numeric,
@@ -39,45 +61,8 @@ build_growth_scaffold <- function(pv_srf, start, end) {
   start_srf <- simple %>% filter(academic_year == start)
   end_srf <- simple %>% filter(academic_year == end)
 
-  #define the columns for the output
-  #this lets us return a zero-length data frame if there's no
-  #matching data
-  output_cols <- list(
-    parcc_student_identifier = character(),
-    state_student_identifier = character(),
-    local_student_identifier = character(),
-    subject_area = character(),
-    start_year = integer(),
-    start_responsible_school_code = character(),
-    start_responsible_school_name = character(),
-    start_assessment_grade = integer(),
-    start_student_grade = integer(),
-    start_subject = character(),
-    start_test_code = character(),
-    start_test_scale_score = integer(),
-    start_test_performance_level = integer(),
-
-    end_year = integer(),
-    end_responsible_school_code = character(),
-    end_responsible_school_name = character(),
-    end_assessment_grade = integer(),
-    end_student_grade = integer(),
-    end_subject = character(),
-    end_test_code = character(),
-    end_test_scale_score = integer(),
-    end_test_performance_level = integer()
-  )
-
-  #empty tibble
-  empty <- as_tibble(output_cols)
-
-  #if there's no data, don't worry about matching; just return a zero row df
-  if (nrow(start_srf) == 0) {
-    return(empty)
-  }
-
-  start_prefixes <- c(rep('', 4), rep('start_', 8))
-  end_prefixes <- c(rep('', 4), rep('end_', 8))
+  start_prefixes <- c(rep('', 4), rep('start_', 9))
+  end_prefixes <- c(rep('', 4), rep('end_', 9))
 
   names(start_srf) <- paste0(start_prefixes, names(start_srf))
   names(end_srf) <- paste0(end_prefixes, names(end_srf))
@@ -89,17 +74,55 @@ build_growth_scaffold <- function(pv_srf, start, end) {
       target_end_key = paste(state_student_identifier, next_test, sep = '_')
     )
 
+  #matched
   matched_rows <- inner_join(
-    start_srf, end_srf[,c(5:12)], by = c('target_end_key'='end_key')
+    start_srf, end_srf[,c(5:13)], by = c('target_end_key'='end_key')
+  ) %>%
+  mutate(
+    match_status = 'start and end',
+    complete_obsv = TRUE
   )
+
+  #start only
+  only_start <- dplyr::anti_join(
+    start_srf, matched_rows, by = 'start_key'
+  ) %>%
+  mutate(
+    end_academic_year = end,
+    end_subject = subject_area(next_test),
+    match_status = 'only_start',
+    complete_obsv = FALSE
+  ) %>%
+  rename(
+    end_test_code = next_test
+  ) %>%
+  select(-start_key, -target_end_key)
+
+  #end only
+  only_end <- dplyr::anti_join(
+    end_srf, matched_rows, by = c('end_key'='target_end_key')
+  ) %>%
+  mutate(
+    start_academic_year = start,
+    start_test_code = prior_test(end_test_code),
+    start_subject = subject_area(start_test_code),
+    match_status = 'only_end',
+    complete_obsv = FALSE
+  ) %>%
+  select(-end_key)
+
+  matched_rows <- matched_rows %>%
+    select(-target_end_key, -start_key, -next_test)
+
+  bind_rows(matched_rows, only_start, only_end)
 }
 
 
-#' Returns the next sequential test code
+#' Returns sequential test code (next or prior)
 #'
 #' @param x a test code
 #'
-#' @return the follownig test code using standard PARCC progression
+#' @return the next or prior test code using standard PARCC progression
 #' @export
 
 next_test <- function(x) {
@@ -121,5 +144,29 @@ next_test <- function(x) {
     x == 'MAT08' ~ "ALG01",
     x == 'ALG01' ~ "GEO01",
     x == 'GEO01' ~ "ALG02"
+  )
+}
+
+#' @export
+
+prior_test <- function(x) {
+  case_when(
+    x == 'ELA11' ~ "ELA10",
+    x == 'ELA10' ~ "ELA09",
+    x == 'ELA09' ~ "ELA08",
+    x == 'ELA08' ~ "ELA07",
+    x == 'ELA07' ~ "ELA06",
+    x == 'ELA06' ~ "ELA05",
+    x == 'ELA05' ~ "ELA04",
+    x == 'ELA04' ~ "ELA03",
+
+    x == 'ALG02' ~ "GEO01",
+    x == 'GEO01' ~ "ALG01",
+    x == 'ALG01' ~ "MAT08",
+    x == 'MAT08' ~ "MAT07",
+    x == 'MAT07' ~ "MAT06",
+    x == 'MAT06' ~ "MAT05",
+    x == 'MAT05' ~ "MAT04",
+    x == 'MAT04' ~ "MAT03"
   )
 }
