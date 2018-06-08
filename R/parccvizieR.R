@@ -27,7 +27,9 @@ parccvizieR <- function(results, local_roster = NA, verbose = TRUE) {
 parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...) {
 
   #read in results.  get a list of one OR MORE paths to files.
+  if(verbose) print('Reading in raw results files...')
   raw_files <- read_raw_results(results)
+  if(verbose) sprintf('Found %s raw results files', length(raw_files))
 
   #for EACH FILE, determine the layout
   file_layouts <- map_chr(
