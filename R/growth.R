@@ -1,4 +1,4 @@
-#' Generate growth data
+t#' Generate growth data
 #'
 #' @param a PARCC summative record file.  assumes one row per student
 #' per test code per year (eg output of dedupe_srf)
@@ -15,7 +15,7 @@ generate_growth_data <- function(srf) {
   #build growth df
   growth_df <- map_df(
     .x = unq_years,
-    .f = function(.x) build_growth_df(pv$srf, .x, .x + 1)
+    .f = function(.x) build_growth_df(srf, .x, .x + 1)
   )
 
   #calculate growth metrics
