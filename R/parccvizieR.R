@@ -27,14 +27,18 @@ parccvizieR <- function(results, local_roster = NA, verbose = TRUE) {
 parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...) {
 
   #read in results.  get a list of one OR MORE paths to files.
-  if(verbose) print('Reading in raw results files...')
+  if(verbose) print('Reading in raw result file(s)...')
   raw_files <- read_raw_results(results)
-  if(verbose) sprintf('Found %s raw results files', length(raw_files))
+  if(verbose) print(sprintf('Found %s raw result file(s).', length(raw_files)))
 
   #for EACH FILE, determine the layout
   file_layouts <- map_chr(
     raw_files,
     detect_result_file_layout
+  )
+  if(verbose) print(
+    sprintf('File(s) are in the following format(s): %s.',
+            unique(file_layouts) %>% paste(., collapse = ', '))
   )
 
   #list to house all of the parccvizieR data objects
@@ -342,7 +346,7 @@ read_results_file <- function(path, format) {
 
 basic_read_and_clean <- function(path) {
   df <- suppressMessages(suppressWarnings(
-    readr::read_csv(path) %>%
+    suppressMessages(suppressWarnings(readr::read_csv(path))) %>%
       janitor::clean_names()
   ))
 
