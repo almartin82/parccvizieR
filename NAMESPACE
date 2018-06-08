@@ -2,6 +2,7 @@
 
 S3method(parccvizieR,default)
 S3method(print,parccvizieR)
+export(basic_summary_stats)
 export(build_growth_df)
 export(clean_nj_2016_plus)
 export(cohort_year)
