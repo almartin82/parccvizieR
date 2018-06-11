@@ -4,7 +4,8 @@
 \alias{pv_limit_srf}
 \title{Limit a parccvizieR SRF data frame}
 \usage{
-pv_limit_srf(pv_obj, studentids, subject_area = NA, academic_year = NA)
+pv_limit_srf(pv_obj, studentids, subject_area = NA, academic_year = NA,
+  grade_level_when_assessed = NA, test_code = NA)
 }
 \arguments{
 \item{pv_obj}{a conforming parccvizieR object}
@@ -14,6 +15,10 @@ pv_limit_srf(pv_obj, studentids, subject_area = NA, academic_year = NA)
 \item{subject_area}{optional, ELA or Math}
 
 \item{academic_year}{optional, ending YYYY}
+
+\item{grade_level_when_assessed}{optional, gr 3-11}
+
+\item{test_code}{optional, PARCC test code}
 }
 \description{
 Limit a parccvizieR SRF data frame

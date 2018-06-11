@@ -5,7 +5,7 @@
 \title{Calculate basic summary stats.  Useful for initial 'how did we do' cuts and questions.}
 \usage{
 basic_summary_stats(pv_obj, studentids, subject_area = NA,
-  academic_year = NA)
+  academic_year = NA, grade_level_when_assessed = NA)
 }
 \arguments{
 \item{pv_obj}{a conforming parccvizieR object}
@@ -15,6 +15,8 @@ basic_summary_stats(pv_obj, studentids, subject_area = NA,
 \item{subject_area}{optional, ELA or Math}
 
 \item{academic_year}{optional, ending YYYY}
+
+\item{grade_level_when_assessed}{optional, gr 3-11}
 }
 \value{
 summary data frame
