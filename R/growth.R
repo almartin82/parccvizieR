@@ -49,6 +49,7 @@ build_growth_df <- function(srf, start, end, verbose = TRUE) {
 
   #limited srf
   simple <- srf %>%
+    ungroup() %>%
     select(
       parcc_student_identifier,
       state_student_identifier,

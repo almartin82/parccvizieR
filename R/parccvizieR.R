@@ -24,38 +24,71 @@ parccvizieR <- function(results, local_roster = NA, verbose = TRUE) {
 }
 
 #' @export
-parccvizieR.default <- function(results, local_roster = NA, verbose = FALSE, ...) {
+parccvizieR.default <- function(results, local_roster = NA, verbose = TRUE, ...) {
 
   #read in results.  get a list of one OR MORE paths to files.
+  if(verbose) print('Reading in raw result file(s)...')
   raw_files <- read_raw_results(results)
+  if(verbose) print(sprintf('Found %s raw result file(s).', length(raw_files)))
 
   #for EACH FILE, determine the layout
   file_layouts <- map_chr(
     raw_files,
     detect_result_file_layout
   )
+  if(verbose) print(
+    sprintf('File(s) are in the following format(s): %s.',
+            unique(file_layouts) %>% paste(., collapse = ', '))
+  )
 
   #list to house all of the parccvizieR data objects
   out <- list()
 
   #use map2df on the list of files and list of layouts to
-  # process the data
+  #process the data
   out$raw <- map2_df(
     .x = raw_files,
     .y = file_layouts,
-    .f = ~read_results_file(.x, .y)
+    .f = ~read_results_file(.x, .y, verbose)
   )
 
   #determine the best record to keep and return that as the srf object
+  if(verbose) print('De-duping multiple test events per student per test per year...')
   out$srf <- dedupe_srf(out$raw) %>%
     filter(rn == 1) %>%
     select(-rn)
+  if(verbose) print(
+    sprintf('Identified and discarded %s duplicate test events', nrow(out$raw) - nrow(out$srf))
+  )
+
+  #set default grouping on the srf to support summary stats
+  out$srf <- out$srf %>%
+    dplyr::group_by(academic_year,
+             subject_area,
+             responsible_school_code,
+             responsible_school_name,
+             assessment_grade_numeric,
+             test_code)
 
   #make the growth object
+  if(verbose) print('Generating a growth dataframe...')
   out$growth_df <- generate_growth_data(out$srf)
+  if(verbose) print(
+    sprintf('Created a growth dataframe with %s rows across %s growth terms',
+            nrow(out$growth_df), length(unique(out$growth_df$growth_window)))
+  )
 
   #return parccvizieR object
-  class(out) <- "parccvizieR"
+  class(out) <- c("parccvizieR", class(out))
+  class(out$srf) <- c("parccvizieR_srf", class(out$srf))
+  class(out$growth_df) <- c("parccvizieR_growth_df", class(out$growth_df))
+
+  #make all the dfs a parccvizieR object
+  out$raw <- parccvizieR_data(out$raw)
+  out$srf <- parccvizieR_data(out$srf)
+  out$growth_df <- parccvizieR_data(out$growth_df)
+
+  if(verbose) say("parccvizieR object created!", "cow")
 
   out
 }
@@ -101,8 +134,10 @@ read_raw_results <- function(x) {
 
 detect_result_file_layout <- function(df_path) {
 
-  df_names <- suppressMessages(suppressWarnings(readr::read_csv(df_path))) %>%
-    names()
+  df_names <- suppressMessages(suppressWarnings(
+    readr::read_csv(df_path, progress = FALSE)
+  )) %>%
+  names()
 
   NJ_SRF15 <- c("recordType", "multipleRecordFlag", "reportedSummativeScoreFlag",
                 "reportedRosterFlag", "reportSuppressionCode", "reportSuppressionAction",
@@ -312,20 +347,36 @@ detect_result_file_layout <- function(df_path) {
 #'
 #' @param path full path to file, output of read_raw_results
 #' @param format file format detected, output of detect_result_file_layout
+#' @param verbose print status updates as the data is processed?
+#' default is FALSE
 #'
 #' @return data.frame/tbl
 #' @export
 
-read_results_file <- function(path, format) {
+read_results_file <- function(path, format, verbose = FALSE) {
+
+  file_update <- function(df) {
+    sprintf('Processed %s rows representing %s students and %s unique tests.',
+            nrow(df), length(unique(df$state_student_identifier)),
+            length(unique(df$test_code)))
+  }
 
   if (format == 'NJ_SRF15') {
+    if(verbose) print('Processing 2015 NJ SRF...')
     out <- process_nj_srf15(path)
+    if(verbose) print(file_update(out))
   } else if (format == 'NJ_SRF16') {
+    if(verbose) print('Processing 2016 NJ SRF...')
     out <- process_nj_srf16(path)
+    if(verbose) print(file_update(out))
   } else if (format == 'NJ_SRF17') {
+    if(verbose) print('Processing 2017 NJ SRF...')
     out <- process_nj_srf17(path)
+    if(verbose) print(file_update(out))
   } else if (format == 'NJ_SRF18') {
+    if(verbose) print('Processing 2018 NJ SRF...')
     out <- process_nj_srf18(path)
+    if(verbose) print(file_update(out))
   }
 
   out
@@ -340,9 +391,9 @@ read_results_file <- function(path, format) {
 
 basic_read_and_clean <- function(path) {
   df <- suppressMessages(suppressWarnings(
-    readr::read_csv(path) %>%
-      janitor::clean_names()
-  ))
+    readr::read_csv(path, progress = FALSE)
+  )) %>%
+  janitor::clean_names()
 
   #remove all filler columns per issue #4
   is_filler <- grepl('^filler_', names(df))

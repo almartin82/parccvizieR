@@ -4,12 +4,15 @@
 \alias{read_results_file}
 \title{Read a results file given a path and file format}
 \usage{
-read_results_file(path, format)
+read_results_file(path, format, verbose = FALSE)
 }
 \arguments{
 \item{path}{full path to file, output of read_raw_results}
 
 \item{format}{file format detected, output of detect_result_file_layout}
+
+\item{verbose}{print status updates as the data is processed?
+default is FALSE}
 }
 \value{
 data.frame/tbl
