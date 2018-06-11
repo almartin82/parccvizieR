@@ -45,7 +45,7 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = TRUE, ...)
   out <- list()
 
   #use map2df on the list of files and list of layouts to
-  # process the data
+  #process the data
   out$raw <- map2_df(
     .x = raw_files,
     .y = file_layouts,
@@ -61,6 +61,15 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = TRUE, ...)
     sprintf('Identified and discarded %s duplicate test events', nrow(out$raw) - nrow(out$srf))
   )
 
+  #set default grouping on the srf to support summary stats
+  out$srf <- out$srf %>%
+    dplyr::group_by(academic_year,
+             subject_area,
+             responsible_school_code,
+             responsible_school_name,
+             assessment_grade_numeric,
+             test_code)
+
   #make the growth object
   if(verbose) print('Generating a growth dataframe...')
   out$growth_df <- generate_growth_data(out$srf)
@@ -70,7 +79,14 @@ parccvizieR.default <- function(results, local_roster = NA, verbose = TRUE, ...)
   )
 
   #return parccvizieR object
-  class(out) <- "parccvizieR"
+  class(out) <- c("parccvizieR", class(out))
+  class(out$srf) <- c("parccvizieR_srf", class(out$srf))
+  class(out$growth_df) <- c("parccvizieR_growth_df", class(out$growth_df))
+
+  #make all the dfs a parccvizieR object
+  out$raw <- parccvizieR_data(out$raw)
+  out$srf <- parccvizieR_data(out$srf)
+  out$growth_df <- parccvizieR_data(out$growth_df)
 
   if(verbose) say("parccvizieR object created!", "cow")
 
