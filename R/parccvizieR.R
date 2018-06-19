@@ -545,7 +545,7 @@ subject_area <- function(x) {
 
 process_nj_srf15 <- function(path) {
   basic_read_and_clean(path) %>%
-    mutate(test_scale_score == summative_scale_score)
+    mutate(test_scale_score = summative_scale_score)
 }
 
 #' @rdname process_nj_srf15
