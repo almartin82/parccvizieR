@@ -320,8 +320,76 @@ detect_result_file_layout <- function(df_path) {
                 "FillerField7", "FillerField_28", "FillerField_29", "FillerField_30"
   )
 
+  NJ_SRF18 <- c("StateAbbreviation", "TestingDistrictCode", "TestingSchoolCode",
+                "ResponsibleAccountableDistrictCode", "ResponsibleAccountableSchoolCode",
+                "StateStudentIdentifier", "LocalStudentIdentifier", "PARCCStudentIdentifier",
+                "LastOrSurname", "FirstName", "MiddleName", "Birthdate", "Sex",
+                "StateField1", "GradeLevelWhenAssessed", "HispanicOrLatinoEthnicity",
+                "AmericanIndianOrAlaskaNative", "Asian", "BlackOrAfricanAmerican",
+                "NativeHawaiianOrOtherPacificIslander", "White", "FillerField1",
+                "TwoOrMoreRaces", "EnglishLearnerEL", "TitleIIILimitedEnglishProficientParticipationStatus",
+                "GiftedandTalented", "MigrantStatus", "EconomicDisadvantageStatus",
+                "StudentWithDisabilities", "PrimaryDisabilityType", "StateField2",
+                "StateField3", "StateField4", "StateField5", "StateField6", "StateField7",
+                "StateField8", "StateField9", "StateField10", "StateField11",
+                "StateField12", "StateField13", "StateField14", "StateField15",
+                "FillerField2", "ClassName", "TestAdministrator", "StaffMemberIdentifier",
+                "TestCode", "FillerField", "Retest", "FillerField_1", "FrequentBreaks",
+                "SeparateAlternateLocation", "SmallGroupTesting", "SpecializedEquipmentOrFurniture",
+                "SpecifiedAreaOrSetting", "TimeOfDay", "AnswerMasking", "StudentReadsAssessmentAloudtoSelf",
+                "ColorContrast", "ASLVideo", "AssistiveTechnologyScreenReader",
+                "AssistiveTechnologyNonScreenReader", "ClosedCaptioningForELAL",
+                "RefreshableBrailleDisplayForELAL", "AlternateRepresentationPaperTest",
+                "LargePrint", "BrailleWithTactileGraphics", "FillerField4", "HumanSignerForTestDirections",
+                "AnswersRecordedInTestBook", "BrailleResponse", "CalculationDeviceAndMathematicsTools",
+                "ELALConstructedResponse", "ELALSelectedResponseOrTechnologyEnhancedItems",
+                "MathematicsResponse", "MonitorTestResponse", "WordPredictionForELAL",
+                "AdministrationDirectionsClarifiedinStudentsNativeLanguage",
+                "AdministrationDirectionsReadAloudinStudentsNativeLanguage",
+                "MathematicsResponseEL", "SpanishTransadaptationOfTheMathematicsAssessment",
+                "WordtoWordDictionaryEnglishNativeLanguage", "TextToSpeech",
+                "HumanReaderOrHumanSigner", "UniqueAccommodation", "EmergencyAccommodation",
+                "ExtendedTime", "StudentTestUUID", "PaperFormID", "OnlineFormID",
+                "TestStatus", "TotalTestItems", "TestAttemptednessFlag", "TotalTestItemsAttempted",
+                "PaperSection1TotalTestItems", "PaperSection1NumberofAttemptedItems",
+                "PaperSection2TotalTestItems", "PaperSection2NumberofAttemptedItems",
+                "PaperSection3TotalTestItems", "PaperSection3NumberofAttemptedItems",
+                "PaperSection4TotalTestItems", "PaperSection4NumberofAttemptedItems",
+                "StudentUnit1TestUUID", "Unit1FormID", "Unit1TotalTestItems",
+                "Unit1NumberofAttemptedItems", "StudentUnit2TestUUID", "Unit2FormID",
+                "Unit2TotalTestItems", "Unit2NumberOfAttemptedItems", "StudentUnit3TestUUID",
+                "Unit3FormID", "Unit3TotalTestItems", "Unit3NumberOfAttemptedItems",
+                "StudentUnit4TestUUID", "Unit4FormID", "Unit4TotalTestItems",
+                "Unit4NumberofAttemptedItems", "NotTestedCode", "NotTestedReason",
+                "VoidScoreCode", "VoidScoreReason", "ShipReportDistrictCode",
+                "ShipReportSchoolCode", "SummativeFlag", "MultipleTestRegistration",
+                "RosterFlag", "ReportSuppressionCode", "ReportSuppressionAction",
+                "PaperAttemptCreateDate", "Unit1OnlineTestStartDateTime", "Unit1OnlineTestEndDateTime",
+                "Unit2OnlineTestStartDateTime", "Unit2OnlineTestEndDateTime",
+                "Unit3OnlineTestStartDateTime", "Unit3OnlineTestEndDateTime",
+                "Unit4OnlineTestStartDateTime", "Unit4OnlineTestEndDateTime",
+                "AssessmentYear", "AssessmentGrade", "Subject", "FederalRaceEthnicity",
+                "Period", "TestingOrganizationalType", "TestingDistrictName",
+                "TestingSchoolName", "ResponsibleOrganizationalType", "ResponsibleDistrictName",
+                "ResponsibleSchoolName", "FillerField_2", "FillerField_3", "FillerField_4",
+                "FillerField_5", "FillerField_6", "FillerField_7", "TestScaleScore",
+                "TestCSEMProbableRange", "TestPerformanceLevel", "TestReadingScaleScore",
+                "TestReadingCSEM", "TestWritingScaleScore", "TestWritingCSEM",
+                "Subclaim1Category", "Subclaim2Category", "Subclaim3Category",
+                "Subclaim4Category", "Subclaim5Category", "FillerField5", "FillerField_8",
+                "FillerField_9", "FillerField_10", "FillerField_11", "TestScoreComplete",
+                "FillerField_12", "FillerField_13", "NJNotAttemptFlag", "PercentOfItemsAttempted",
+                "TestScaleScoreIfNotAttempted", "TestCSEMProbableRangeIfNotAttempted",
+                "TestPerformanceLevelIfNotAttempted", "TestReadingScaleScoreIfNotAttempted",
+                "TestReadingCSEMIfNotAttempted", "TestWritingScaleScoreIfNotAttempted",
+                "TestWritingCSEMIfNotAttempted", "Subclaim1CategoryIfNotAttempted",
+                "Subclaim2CategoryIfNotAttempted", "Subclaim3CategoryIfNotAttempted",
+                "Subclaim4CategoryIfNotAttempted", "Subclaim5CategoryIfNotAttempted",
+                "FillerField7", "FillerField_14", "FillerField_15", "FillerField_16",
+                "FillerField_17")
+
   results_files <- list(
-    'NJ_SRF15' = NJ_SRF15, 'NJ_SRF16' = NJ_SRF16, 'NJ_SRF17' = NJ_SRF17
+    'NJ_SRF15' = NJ_SRF15, 'NJ_SRF16' = NJ_SRF16, 'NJ_SRF17' = NJ_SRF17, 'NJ_SRF18' = NJ_SRF18
   )
 
   mask <- vapply(
@@ -430,7 +498,8 @@ basic_read_and_clean <- function(path) {
     ) %>%
     #make columns numeric
     mutate_at(
-      .vars = vars(grade_level_when_assessed),
+      .vars = vars(grade_level_when_assessed,
+                   staff_member_identifier),
       as.numeric
     ) %>%
     #convert assessment year to end year
@@ -458,7 +527,18 @@ basic_read_and_clean <- function(path) {
     #determine the subject area
     mutate(
       subject_area = subject_area(subject)
-    )
+    ) %>%
+    #anything related items should be numeric
+    mutate_at(
+      .vars = vars(matches("items")),
+      as.numeric
+    ) %>%
+  #anything related date should be in date format
+  mutate_at(
+  .vars = vars(matches("date")),
+  ymd
+  )
+
 
   df
 }
@@ -475,47 +555,12 @@ clean_nj_2016_plus <- function(df) {
 
   #character
   df <- df %>%
-    mutate_at(
-      .vars = vars(paper_section1numberof_attempted_items),
-      as.character
-    )
-
-  #numeric
-  df <- df %>%
-    mutate_at(
-      .vars = vars(paper_section1numberof_attempted_items,
-                   paper_section1total_test_items,
-                   paper_section2numberof_attempted_items,
-                   paper_section2total_test_items,
-                   paper_section3numberof_attempted_items,
-                   paper_section3total_test_items,
-                   paper_section4numberof_attempted_items,
-                   paper_section4total_test_items,
-                   unit1total_test_items,
-                   unit2total_test_items,
-                   unit3total_test_items,
-                   unit4total_test_items,
-                   unit4numberof_attempted_items),
-      as.numeric
-    )
-
-  #date
-  df <- df %>%
-    mutate_at(
-      .vars = vars(unit1online_test_start_date_time,
-                   unit1online_test_end_date_time,
-                   unit2online_test_start_date_time,
-                   unit2online_test_end_date_time,
-                   unit3online_test_start_date_time,
-                   unit3online_test_end_date_time,
-                   unit4online_test_start_date_time,
-                   unit4online_test_end_date_time),
-      ymd_hms
-    )
-
+  mutate_at(
+    .vars = vars(test_administrator),
+    as.character
+  )
   df
 }
-
 
 #' Determine Test Subject Area
 #'
