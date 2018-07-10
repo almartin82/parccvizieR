@@ -473,7 +473,7 @@ basic_read_and_clean <- function(path) {
   names(df) <- gsub('aloudin', 'aloud_in', names(df))
   names(df) <- gsub('english_learner_el', 'english_learner', names(df))
   names(df) <- gsub('giftedand_talented', 'gifted_and_talented', names(df))
-
+  names(df) <- gsub('summative_performance_level', 'test_performance_level', names(df))
   names(df) <- gsub('last_name', 'last_or_surname', names(df))
 
   #straight up a typo in the SRF
