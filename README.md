@@ -1,6 +1,9 @@
 # parccvizieR:
 ### an R package that assists with analysis, visualization, and reporting for PARCC data
 
+## Development Note:
+The PARCC consortium is [no more](https://en.wikipedia.org/wiki/PARCC), and no students take the PARCC.  Consequently, there's no need for tools for working with this data!  This repository is now read-only and archived.
+
 # why parccvizieR?
 States across the country have adopted the Common Core, and are using assessment consortia to help evaluate progress against these new standards.
 
